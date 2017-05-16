@@ -19,6 +19,13 @@ https://wiki.onion.io/Tutorials/Reading-1Wire-Sensor-Data
 4. Make a symbolic link for web display:
 ln -s /root/webkeezer/ /www/console/controller
 
+5. Plots for the web interface require Chart.min.js and utils.js from the
+chart.js library.  http://www.chartjs.org/
+
+6. The setup.html page allows dragging to re-order table rows with:
+https://github.com/RubaXa/Sortable
+copy the Sortable.min.js file to the folder with everything else.
+
 
 ## Code
 

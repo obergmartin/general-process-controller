@@ -1,0 +1,38 @@
+
+<html>
+
+<head>
+<title>WebKeezer</title>
+<meta name=viewport content='width=370'>
+<script src="Chart.min.js"></script>
+<script src="utils.js"></script>
+    
+</head>
+
+<body bgcolor=#ffffff text=#000000 link=#ff0000 vlink=#880000 alink=#00ff00>
+
+<h1> Hello, this is Keezer!</h1>
+<a href='setup.html'>Setup Page</a>
+<a href='status.html'>Status Page</a>
+<a href='loghistory.html'>Data Logs</a>
+
+<script type="text/javascript" src="recent.json"></script>
+<script type="text/javascript" src="loglist.json"></script>
+<script type="text/javascript" src="makeplot.js"></script>
+
+<h4 id="timetext">time</h4>
+<h2 id="temptext">temp1C</h2>
+<h2 id="setpointtext">setpoint</h2>
+<h4 id="relaytext">relayState</h4>
+<h2 id="temp2text">temp2C</h2>
+<h4 id="floortext">floorState</h4>
+
+<div style="width:450px;">
+<canvas id="canvas"></canvas>
+</div>
+
+<script type="text/javascript" src="status.js"></script>
+
+</body>
+
+</html>

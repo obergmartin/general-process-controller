@@ -1,0 +1,93 @@
+
+<html>
+
+<head>
+<title>Data Logs</title>
+<meta name=viewport content='width=370'>
+<script src="Chart.min.js"></script>
+<script src="utils.js"></script>
+
+    
+</head>
+
+
+<body bgcolor=#ffffff text=#000000 link=#ff0000 vlink=#880000 alink=#00ff00>
+
+<script type="text/javascript" src="loglist.json"></script>
+<script type="text/javascript" src="makeplot.js"></script>
+
+<script>
+
+
+</script>
+
+<h2> Data Logs</h2>
+<a href='setup.html'>Setup Page</a>
+<a href='status.html'>Status Page</a>
+<a href='loghistory.html'>Data Logs</a>
+
+<div style="width:450px;">
+<canvas id="canvas"></canvas>
+</div>
+
+
+<div id='navArea'>
+<p>Select data file</p>
+<form id='the_form' action='loghistory.html' method='GET'>
+    <input id='button' type='submit' value='Submit'>
+</form>
+</div>
+
+
+<script>
+     
+var httpRequest = new XMLHttpRequest();
+httpRequest.onreadystatechange = function() {
+    if (httpRequest.readyState === 4) {
+        if (httpRequest.status === 200) {
+            //console.log(httpRequest.responseText);
+            //document.data = JSON.parse(httpRequest.responseText.slice(7, httpRequest.responseText.length));
+            //init = data.init;
+            //console.log(init);
+            //show_page();
+            
+            //return data;
+        }
+    }
+};
+
+var splitUrl = window.location.toString().split('?val=');
+if (splitUrl.length === 2) {
+    var getfile = splitUrl[1];
+    //console.log(getfile);
+    httpRequest.open('GET', getfile, false);
+    httpRequest.send();
+    //console.log('response');
+    //console.log(httpRequest.responseText);
+    var data = JSON.parse(httpRequest.responseText.slice(7, httpRequest.responseText.length)); 
+    //console.log(data);
+    plot_it();
+}
+
+</script>
+
+
+
+<script>
+var navArea = document.getElementById('the_form');
+var theButton = document.getElementById('button');
+
+var content = document.createElement("select");
+content.name = 'val';
+for (var j=0; j<loglist.length; j++) {
+  content.options.add( new Option(loglist[j], loglist[j]) );
+}
+content.value = getfile;
+
+navArea.insertBefore(content, theButton);
+
+</script>
+
+</body>
+
+</html>
