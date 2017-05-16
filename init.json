@@ -1,0 +1,25 @@
+{
+ "init": {
+  "DataLog": [
+   "Time"
+  ],
+  "Devices": [
+   {
+    "Name": "time",
+    "Type": "MyClock",
+    "addr": "undefined"
+   }
+  ],
+  "InputVals": [
+   {
+    "Name": "Time",
+    "Device": "time",
+    "fn": "getTimeStamp"
+   },
+  ],
+  "Evals": [
+  ],
+  "Actions": [
+  ]
+ }
+}
