@@ -63,4 +63,4 @@ node server.js &
 node control.js &
 
 3. Navigate to:
-http://<omega-ip-address>:8182/setup.html
+http://omega-ip-address:8182/setup.html
