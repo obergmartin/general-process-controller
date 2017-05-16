@@ -47,7 +47,7 @@ serially and can take some time.  With my tests using two temperature sensors
 I occasionally miss a reading.  
 
 The webserver is used to update values and look at logged data.  It is 
-accessed on the local network at: http://<omega-ip-address>:8182/setup.html.
+accessed on the local network at: http://omega-ip-address:8182/setup.html.
 The status.html page uses status.js and should be updated to suit your needs.
 
 The plots generated at status.html and loghistory.html still need some changes
