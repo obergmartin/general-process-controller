@@ -82,6 +82,28 @@ Use an evaluated variable in Name.  When true, the specified device function wil
 <br>
 <h1>Example</h1>
 <img src='control_setup.png'>
+<h2>Devices</h2>
+The devices are set up with addresses for temperature sensors and the relay address for the Omega2 relay expansion board.
+A 'time' device is also made for plotting logged data.
+
+<h2>Input Variables</h2>
+The variable 'Time' is case sensitivce for making plots.<br>
+Temperatures are measured from both sensor devices.<br>
+The state of the relay is stored in two variables for so that the relay is not told to switch on/off if it is already in that state.<br>
+The ']' in 'isOn' is used to tell the plotting script to create a separate Y-axis on the right.
+(This second Y-axis is hidden for visual simplicity.)<br>
+<b>offTime1</b> records the amount of time the relay has been off.
+
+<h2>Evaluated Variables</h2>
+Constants <b>warmPt</b> and <b>coolPt</b> are bounds that the freezer should stay between.<br>
+<b>offCheck</b> makes sure that the freezer will not cycle too often and burn out the compressor.<br>
+<b>beenOff</b> ensures that the relay is off and has been off for long enough.  (This is probably not necessary, but should prevent wierd bugs.)<br>
+<b>isWarm</b> - is the temperature beyond the warm setpoint?<br>
+<b>isCool</b> - is the temperature beyond the cool setpoint?<br>
+<b>off_and_warm</b> and <b>isCool_and_on</b> are the states used to trigger actions.
+
+<h2>Actions</h2>
+The relay defined in Devices is turned on or off when all conditions are met.
 
 </body>
 
