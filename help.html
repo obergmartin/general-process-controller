@@ -1,0 +1,88 @@
+
+<html>
+
+<head>
+<title>Help</title>
+<meta name=viewport content='width=370'>
+
+</head>
+
+<body bgcolor=#ffffff text=#000000 link=#ff0000 vlink=#880000 alink=#00ff00>
+
+<a href='setup.html'>Setup Page</a>
+<a href='status.html'>Status Page</a>
+<a href='loghistory.html'>Data Logs</a>
+<a href='help.html'>Help</a>
+
+<h1>Help</h1>
+<p>
+
+<h1>Devices</h1>
+
+There is support for 4 devices: Dallas Systems 1-wire temperature sensors, pin io, the Omega relay-expansion board, and a MyClock utility device. 
+
+<h2>DS</h2>
+Address - the address for the sensor:
+<br>
+<pre>cat /sys/devices/w1_bus_master1/w1_master_slaves</pre>
+By default the device outputs in degrees C.  If you want F, edit the ds.js script.  This will be made easier in a future version.
+
+<h2>GPIO</h2>
+Address - Enter the pin number being used.
+
+<h2>RelayExp</h2>
+Address - Enter the address of the relay.
+
+<h2>MyClock</h2>
+Address - leave blank or enter 0
+
+
+<h1>Input Variables</h1>
+<h2>DS</h2>
+getTemp - return the devices temperature reading.
+
+<h2>GPIO</h2>
+getStatus - Return status of pin.  Either 0 or 1.
+<br>
+isOn - 1 if pin in high, 0 if pin is low
+<br>
+isOff - 1 if pin in low, 0 if pin is high
+<br>
+getMinutesOn - number of minutes the pin has been on
+<br>
+getMinutesOff - number of minutes the pin has been off
+<br>
+getTimeOn - miliseconds the pin has been on, 0 if off
+<br>
+getTimeOff - miliseconds the pin has been off, 0 if on 
+
+<h2>RelayExp</h2>
+Same as gpio.
+
+<h2>MyClock</h2>
+getTimeStamp - Needed for plotting logged data.
+
+<h1>Evaluated Variables</h1>
+Input Variables can be evaluated to be used as triggers for Actions.
+<br>
+Constant variables can be entered with the value in the Eval column.
+<br>
+Availiable comparison functions take two arguements. Eg: "gt,1,2" evaluates 1 > 2 and returns false.
+<ul>
+	<li> gt, a, b : (a > b)</li>
+	<li> lt, a, b : (a < b)</li>
+	<li> gte, a, b : (a >= b)</li>
+	<li> lte, a, b : (a <= b)</li>
+	<li> and, a, b : (a && b)</li>
+	<li> or, a, b : (a || b)</li>
+</ul>
+
+<h1>Actions</h1>
+Use an evaluated variable in Name.  When true, the specified device function will be executed.
+<br>
+<h1>Example</h1>
+<img src='control_setup.png'>
+
+</body>
+
+</html>
