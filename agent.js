@@ -65,8 +65,7 @@ Agent.prototype.updateVals = function() {
   for (var i=0; i<this.InputValFn.length; i++) {
   	var cur = this.InputValFn[i];
   	//console.log(cur);
-    //console.log(cur, this.inputVals[cur.Name]);
-
+    
     if ('Device' in cur) {
       //console.log(cur);
       // "Device": dv, "fn": fn
@@ -134,7 +133,6 @@ Agent.prototype.setup = function() {
   this.ini = JSON.parse(obj).init;
   
   console.log('setup...');
-  //console.log(this.ini);
   
   for (var i=0; i<this.ini.Devices.length; i++) {
     var cur = this.ini.Devices[i];
@@ -171,10 +169,8 @@ Agent.prototype.setup = function() {
   console.log(this.dev);
   console.log(this.dev.time.getTimeStamp());
 
-  //if (this.ini.InputVals != null) {
   this.InputValFn = this.ini.InputVals;
   console.log(this.InputValFn);
-  //}
   
   for (var i=0; i<this.ini.Evals.length; i++) {
       var cur = this.ini.Evals[i];
@@ -184,8 +180,6 @@ Agent.prototype.setup = function() {
   console.log('evals', this.InputValFn);
 
   this.Actions = this.ini.Actions;
-  //console.log(this.Actions);
-
   
   // If there are variables to log make sure that the proper filename is set 
   // and that a new file is created (with a header) if necessary.
@@ -193,7 +187,7 @@ Agent.prototype.setup = function() {
 
   this.logfn = this.GetRecentLogFile();
   //console.log(this.logfn);
-    
+
   if (this.logfn == -1) {
     // no log file yet, make new one
     this.MakeFileName();
@@ -222,9 +216,7 @@ Agent.prototype.setup = function() {
     }
   }
   // otherwise filename has already been set and header written.
-  
   this.inputVals.date = this.makeFn().substr(0,10);
-
 };
 
 
@@ -315,6 +307,5 @@ Agent.prototype.dataLog = function() {
 Agent.prototype.plotData = function() {
 
 };
-
 
 module.exports = Agent;
