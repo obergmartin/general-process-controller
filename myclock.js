@@ -15,7 +15,6 @@ MyClock.prototype.getTimeStamp = function(){
 }
 
 MyClock.prototype.makeFn = function(){
-    // Not using this anymore, but may be handy later
 	var d = new Date();
     //return d.toISOString().substr(0,10)+".csv";
     return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.csv';
