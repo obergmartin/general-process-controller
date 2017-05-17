@@ -21,7 +21,7 @@ plot_it = function() {
     		console.log(xdata);
     	} else {
     		k += 1;
-    		var yaxid = (cols[i] === 'isOn')
+    		var yaxid = (cols[i].endsWith(']'))
     		    ? 'y-axis-2'
     		    : 'y-axis-0';
 
@@ -34,7 +34,7 @@ plot_it = function() {
     			lineTension: 0,
     			yAxisID: yaxid
     		};
-    		if (cols[i] === 'isOn') {
+    		if (cols[i].endsWith(']')) {
     			new_data.fill = true;
     			new_data.fillOpacity = 0.2;
     		}
@@ -97,4 +97,8 @@ plot_it = function() {
 };    
  
 
-
+//console.log(document.data);
+//var data = document.data;
+    
+        //window.onload = function() {
+        
