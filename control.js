@@ -1,5 +1,4 @@
 const Agent = require('./agent');
-
 var a = new Agent('./init.json');
 
 var mainLoop = function() {
@@ -12,4 +11,3 @@ var mainLoop = function() {
 console.log("Starting Agent...");
 mainLoop();
 setInterval(mainLoop, 60000);
-
