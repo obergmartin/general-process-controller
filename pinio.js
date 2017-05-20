@@ -1,5 +1,6 @@
 'use strict';
 
+var ChildProcess = require('child_process');
 
 function PinIO(pin){
     this.pin = pin;
@@ -37,7 +38,6 @@ PinIO.prototype.getMinutesOff = function(){
 };
 
 PinIO.prototype.setRelayOn = function(){
-    var ChildProcess = require('child_process');
     var cmd = "gpioctl dirout-high " + this.pin;
     ChildProcess.execSync(cmd);
 
@@ -46,7 +46,6 @@ PinIO.prototype.setRelayOn = function(){
 };
 
 PinIO.prototype.setRelayOff = function(){
-    var ChildProcess = require('child_process');
     var cmd = "gpioctl dirout-low " + this.pin;
     ChildProcess.execSync(cmd);
 

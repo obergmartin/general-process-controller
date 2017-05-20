@@ -1,12 +1,14 @@
+//rewrite to use:
+//https://docs.onion.io/omega2-docs/relay-expansion-node-module.html
 'use strict';
 
+var ChildProcess = require('child_process');
 
 function RelayExp(addr){
     this.addr = addr;
     this.lastOn = 0;
     this.setRelayOff();
     this.lastOff = 0;//+ Date();
-    
 }
     
 RelayExp.prototype.getStatus = function(){
@@ -38,7 +40,6 @@ RelayExp.prototype.getMinutesOff = function(){
 };
 
 RelayExp.prototype.setRelayOn = function(){
-    var ChildProcess = require('child_process');
     var cmd = "relay-exp " + this.addr + " on";
     ChildProcess.execSync(cmd);
 
@@ -47,7 +48,6 @@ RelayExp.prototype.setRelayOn = function(){
 };
 
 RelayExp.prototype.setRelayOff = function(){
-    var ChildProcess = require('child_process');
     var cmd = "relay-exp " + this.addr + " off";
     ChildProcess.execSync(cmd);
 
