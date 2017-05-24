@@ -8,24 +8,23 @@
 </head>
 
 <body bgcolor=#ffffff text=#000000 link=#ff0000 vlink=#880000 alink=#00ff00>
+<div style='width:700px'>
 
-<a href='setup.html'>Setup Page</a>
-<a href='status.html'>Status Page</a>
-<a href='loghistory.html'>Data Logs</a>
-<a href='help.html'>Help</a>
+<script type="text/javascript" src="links.js"></script>
 
 <h1>Help</h1>
 <p>
 
 <h1>Devices</h1>
 
-There is support for 4 devices: Dallas Systems 1-wire temperature sensors, pin io, the Omega relay-expansion board, and a MyClock utility device. 
+There is support for 4 devices: Dallas Systems 1-wire temperature sensors (DS), 
+pin io (gpio), the Omega relay-expansion board (relayexp), and a MyClock utility device (MyClock). 
+The names given here to the devices are used in the Input Variables section.
 
 <h2>DS</h2>
 Address - the address for the sensor:
 <br>
 <pre>cat /sys/devices/w1_bus_master1/w1_master_slaves</pre>
-By default the device outputs in degrees C.  If you want F, edit the ds.js script.  This will be made easier in a future version.
 
 <h2>GPIO</h2>
 Address - Enter the pin number being used.
@@ -86,6 +85,7 @@ Use an evaluated variable in Name.  When true, the specified device function wil
 The devices are set up with addresses for temperature sensors and the relay address for the Omega2 relay expansion board.
 A 'time' device is also made for plotting logged data.
 
+
 <h2>Input Variables</h2>
 The variable 'Time' is case sensitivce for making plots.<br>
 Temperatures are measured from both sensor devices.<br>
@@ -105,6 +105,7 @@ Constants <b>warmPt</b> and <b>coolPt</b> are bounds that the freezer should sta
 <h2>Actions</h2>
 The relay defined in Devices is turned on or off when all conditions are met.
 
+</div>
 </body>
 
 </html>

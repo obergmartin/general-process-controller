@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>Device Setup</TITLE>
+
+<LINK rel='stylesheet' type='text/css' href='style.css'>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<h2>Device Setup</h2>
+<script type="text/javascript" src="links.js"></script>
+
+<script type="text/javascript" src="dslist.json"></script>
+
+<div id='area' class='block_container'><h4>DS sensors:</h4></div><br>
+
+<script>
+
+content = document.createElement('p');
+content.innerHTML = dslist.join('<br>');
+
+area = document.getElementById('area');
+area.appendChild(content);
+</script>
+
+
+</BODY>
+</HTML>
