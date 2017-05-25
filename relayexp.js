@@ -3,12 +3,16 @@
 'use strict';
 
 var ChildProcess = require('child_process');
+var relay = require('/usr/bin/node-relay-exp');
 
-function RelayExp(addr){
+function RelayExp(addr, channel){
+//function RelayExp(addr){
     this.addr = addr;
+    this.channel = channel;
     this.lastOn = 0;
     this.setRelayOff();
     this.lastOff = 0;//+ Date();
+    //relay.init(addr);
 }
     
 RelayExp.prototype.getStatus = function(){
@@ -41,16 +45,16 @@ RelayExp.prototype.getMinutesOff = function(){
 
 RelayExp.prototype.setRelayOn = function(){
     var cmd = "relay-exp " + this.addr + " on";
-    ChildProcess.execSync(cmd);
-
+    //ChildProcess.execSync(cmd);
+    relay.setChannel(this.addr, this.channel, 1);
     this.status = 1;
     this.lastOn = + new Date();
 };
 
 RelayExp.prototype.setRelayOff = function(){
     var cmd = "relay-exp " + this.addr + " off";
-    ChildProcess.execSync(cmd);
-
+    //ChildProcess.execSync(cmd);
+    relay.setChannel(this.addr, this.channel, 0);
     this.status = 0;
     this.lastOff = + new Date();
 };

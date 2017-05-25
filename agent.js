@@ -136,31 +136,33 @@ Agent.prototype.setup = function() {
     //console.log(i, cur);
     if (cur.Type === 'DS'){
       if (!(cur.Name in this.dev)){
-        var obj = new DS(cur.addr);
-        this.dev[cur.Name] = obj;
+        //var obj = new DS(cur.addr);
+        this.dev[cur.Name] = new DS(cur.addr);
       }
     } 
     else if (cur.Type === 'gpio') {
   	  if  (!(cur.Name in this.dev)) {
-        var obj = new Gpio(cur.addr);
-        this.dev[cur.Name] = obj;
+        //var obj = new Gpio(cur.addr);
+        this.dev[cur.Name] = new Gpio(cur.addr);
   	  }
     }
     else if (cur.Type === 'relayexp'){ 
       if (!(cur.Name in this.dev)) {
-        var obj = new RelayExp(cur.addr);
-        this.dev[cur.Name] = obj;
+      	var parm = cur.addr.split(',');
+      	//var obj = new RelayExp(parm[0], parm[1]);
+        //var obj = new RelayExp(cur.addr);
+        this.dev[cur.Name] = new RelayExp(+parm[0], +parm[1]);
       }
     }
     else if (cur.Type === 'MyClock'){ 
       if (!(cur.Name in this.dev)) {
-        var obj = new MyClock();
-        this.dev[cur.Name] = obj;
+        //var obj = new MyClock();
+        this.dev[cur.Name] = new MyClock();
       }
       //console.log(obj);
     }
   //this.dev[cur.Name] = obj;
-}
+  }
   
   console.log('Setup: devices');
   console.log(this.dev);
