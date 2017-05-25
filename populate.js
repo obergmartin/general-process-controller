@@ -127,24 +127,30 @@ function make_row(cellInfo) {
     var new_cell = document.createElement('td');
     var content = document.createElement('p');
     if (cur.type === 'inputText'){
-      //var drag_hand = document.createElement("span");
-      //drag_hand.class = "drag-handle";
-      //drag_hand.value = "&#9776;";
-      //new_cell.appendChild(drag_hand);
       content = document.createElement("input");
       content.type = "text";
       content.value = cur.val;
-    } else if (cur.type === "selectMenu"){
+    } 
+    else if (cur.type === "inputAddr") {
+      // attach function for when text box is selected
+      //x.parentElement.children[1].children[0].value
+      content = document.createElement("input");
+      content.type = "text";
+      content.value = cur.val;
+    }
+    else if (cur.type === "selectMenu"){
       content = document.createElement("select");
       for (var j=0; j<cur.val[0].length; j++) {
         content.options.add( new Option(cur.val[0][j], cur.val[0][j]) );
       }
       content.value = cur.val[1];
-    } else if (cur.type === "checkBox") {
+    } 
+    else if (cur.type === "checkBox") {
       content = document.createElement("input");
       content.type = "checkbox";
       content.checked = cur.val;
-    } else if (cur.type == null) {
+    } 
+    else if (cur.type == null) {
       content = document.createElement('p');
       //console.log(cur);
       content.innerHTML = cur;//['val'];
@@ -297,7 +303,8 @@ header.appendChild( make_row(['Name', 'Device', 'Action']) );
 for (i=0; i<init.Actions.length; i++) {
   var new_row = make_row( [
     {'type': 'inputText', 'val': init.Actions[i].Trigger},
-    {'type': 'selectMenu', 'val': [["ds1","io1"], init.Actions[i].Object]},
+    //{'type': 'selectMenu', 'val': [["ds1","io1"], init.Actions[i].Object]},
+    {'type': 'selectMenu', 'val': [avail_devs, init.Actions[i].Object]},
     {'type': 'inputText', 'val': init.Actions[i].fn} ]);
   tables.Actions.appendChild(new_row);
 }
@@ -309,7 +316,8 @@ action_button.value = "Add Row";
 action_button.onclick = function(){ 
 var new_row = make_row( [
     {'type': 'inputText', 'val': ''},
-    {'type': 'selectMenu', 'val': [["ds1","io1"], "Select"]},
+    //{'type': 'selectMenu', 'val': [["ds1","io1"], "Select"]},
+    {'type': 'selectMenu', 'val': [avail_devs, "Select"]},
     {'type': 'inputText', 'val': ''} ]);
   tables.Actions.appendChild(new_row);};
 
