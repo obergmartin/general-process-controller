@@ -7,6 +7,7 @@ const RelayExp = require('./relayexp');
 const MyClock = require('./myclock');
 
 var funs = {};
+funs.eq =  function(a,b){ return a == b; };
 funs.gt =  function(a,b){ return a > b; };
 funs.lt =  function(a,b){ return a < b; };
 funs.gte = function(a,b){ return a >= b; };
@@ -80,7 +81,7 @@ Agent.prototype.updateVals = function() {
     else if ('Eval' in cur) {
       if (typeof cur.Eval === 'string') {
       	// "Eval": constant
-      	this.inputVals[cur.Name] = cur.Eval;
+      	this.inputVals[cur.Name] = + cur.Eval;
       }
       else {
         // "Eval": [fn, a, b]
@@ -113,7 +114,8 @@ Agent.prototype.updateActs = function() {
 
   for (var i=0; i<this.Actions.length; i++) {
     var cur_act = this.Actions[i];
-    var isTrue = (this.inputVals[cur_act.Trigger] === true);
+    // == allows for 1 to evaluate as true
+    var isTrue = (this.inputVals[cur_act.Trigger] == true);
 
     if (isTrue === true) {
       console.log(cur_act.Trigger, isTrue, ':', cur_act.Object, cur_act.fn);
