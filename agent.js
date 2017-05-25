@@ -13,7 +13,9 @@ funs.gte = function(a,b){ return a >= b; };
 funs.lte = function(a,b){ return a <= b; };
 funs.and = function(a,b){ return a && b; };
 funs.or =  function(a,b){ return a || b; };
-
+funs.add = function(a,b){ return a + b; };
+funs.sub = function(a,b){ return a - b; };
+funs.diff= function(a,b){ return a - b < 0 ? b - a : a - b; };
 
 var ArraysAreEqual = function(a, b) {
   if (a.length != b.length) {
@@ -77,9 +79,8 @@ Agent.prototype.updateVals = function() {
     } 
     else if ('Eval' in cur) {
       if (typeof cur.Eval === 'string') {
+      	// "Eval": constant
       	this.inputVals[cur.Name] = cur.Eval;
-      	//console.log(cur.Name, this.inputVals[cur.Name]);
-        //console.log('');
       }
       else {
         // "Eval": [fn, a, b]
@@ -95,15 +96,11 @@ Agent.prototype.updateVals = function() {
           : cur.Eval[2];
         
         this.inputVals[cur.Name] = funs[fn](a, b);
-        //console.log(fn, a, b, this.inputVals[cur.Name]);
-        //console.log('');
       }
     }
     console.log(cur, this.inputVals[cur.Name]);
     
   }
-
-  
 };
 
 
@@ -264,7 +261,6 @@ Agent.prototype.IterFileName = function() {
   // remove file extension
   var basename = this.logfn.split('.')[0];
 
-  // 
   if (basename.indexOf('_') == -1) {
     // first iteration
     this.logfn = basename + '_1.csv';
@@ -276,7 +272,7 @@ Agent.prototype.IterFileName = function() {
     this.logfn = parts.join('_') + '.csv';
     console.log('iterfilename: ', this.logfn);
   }
-      
+
   console.log(this.logfn);    
 };
 
@@ -309,3 +305,5 @@ Agent.prototype.plotData = function() {
 };
 
 module.exports = Agent;
+
+
