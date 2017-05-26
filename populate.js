@@ -7,6 +7,28 @@
 var init = {};
 var tables = {};
 
+var deviceFunctions = {
+  "DS": [
+    "getTempC",
+    "getTempF"
+  ],
+  "relayexp": [
+    "isOn",
+    "isOff",
+    "getMinutesOn",
+    "getMinutesOff"
+  ],
+  "gpio": [
+    "isOn",
+    "isOff",
+    "getMinutesOn",
+    "getMinutesOff"
+  ],
+  "MyClock": [
+    "getTimeStamp"
+  ]
+};
+
 var httpRequest = new XMLHttpRequest();
 httpRequest.onreadystatechange = function() {
     if (httpRequest.readyState === 4) {
@@ -117,6 +139,31 @@ function update_page() {
   window.location.href = "setup.html";
 }
 
+
+function getDeviceType(s) {
+  for (var i = 0; i < init.Devices.length; i++) {
+    if (init.Devices[i].Name == s) {
+      return init.Devices[i].Type;
+    }
+  }
+  return "Error - Not Found.";
+}
+
+
+function changeSelect() {
+  var c = this.parentElement.parentElement.children[3];
+  var fns = deviceFunctions[getDeviceType(this.value)];
+  c.removeChild(c.firstChild);
+
+  content = document.createElement('select');
+  for (var i = 0; i < fns.length; i++) {
+    content.options.add( new Option(fns[i], fns[i]) );
+  }
+  content.value = 'Select';
+  c.appendChild(content);
+}
+
+
 function make_row(cellInfo) {
 // Returns a TR element with necessary TD children to be attached to a document.
 //
@@ -144,6 +191,7 @@ function make_row(cellInfo) {
         content.options.add( new Option(cur.val[0][j], cur.val[0][j]) );
       }
       content.value = cur.val[1];
+      content.onchange = changeSelect;
     } 
     else if (cur.type === "checkBox") {
       content = document.createElement("input");
@@ -222,12 +270,13 @@ header.appendChild( make_row(['Name', 'Log', 'Device', 'Function']) );
   
 for (i=0; i<init.InputVals.length; i++) {
   var isChecked = (init.DataLog.indexOf(init.InputVals[i].Name) != -1);
+  var avail_fns = deviceFunctions[getDeviceType(init.InputVals[i].Device)];
   var new_row = make_row( [
     {'type': 'inputText', 'val': init.InputVals[i].Name},
     {'type': 'checkBox', 'val': isChecked},
-    //{'type': 'selectMenu', 'val': [["ds1","io1","time","const"], init.InputVals[i].Device]},
     {'type': 'selectMenu', 'val': [avail_devs, init.InputVals[i].Device]},
-    {'type': 'inputText', 'val': init.InputVals[i].fn} ]);
+    {'type': 'selectMenu', 'val': [avail_fns, init.InputVals[i].fn]}
+  ]);
   tables.InputVals.appendChild(new_row);
   
 }
@@ -241,7 +290,8 @@ var new_row = make_row( [
     {'type': 'inputText', 'val': ''},
     {'type': 'checkBox', 'val': 0},
     {'type': 'selectMenu', 'val': [avail_devs, "Select"]},
-    {'type': 'inputText', 'val': ''} ]);
+    {'type': 'selectMenu', 'val': ['','']}
+  ]);
   tables.InputVals.appendChild(new_row);};
 
 var_area.appendChild(var_button);
