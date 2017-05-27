@@ -7,7 +7,7 @@
 var init = {};
 var tables = {};
 
-var deviceFunctions = {
+var deviceFunctionsInput = {
   "DS": [
     "getTempC",
     "getTempF"
@@ -26,6 +26,23 @@ var deviceFunctions = {
   ],
   "MyClock": [
     "getTimeStamp"
+  ]
+};
+
+var deviceFunctionsOutput = {
+  "relayexp": [
+    "setRelayOn",
+    "setRelayOff"
+  ],
+  "gpio": [
+    "setRelayOn",
+    "setRelayOff"
+  ],
+  "DS": [
+    " "
+  ],
+  "MyClock": [
+    " "
   ]
 };
 
@@ -150,9 +167,25 @@ function getDeviceType(s) {
 }
 
 
-function changeSelect() {
+function changeInputSelect() {
+  //var x = this.parentElement.parentElement.children.length - 1;
   var c = this.parentElement.parentElement.children[3];
-  var fns = deviceFunctions[getDeviceType(this.value)];
+  var fns = deviceFunctionsInput[getDeviceType(this.value)];
+  c.removeChild(c.firstChild);
+
+  content = document.createElement('select');
+  for (var i = 0; i < fns.length; i++) {
+    content.options.add( new Option(fns[i], fns[i]) );
+  }
+  content.value = 'Select';
+  c.appendChild(content);
+}
+
+
+function changeActionSelect() {
+  //var x = this.parentElement.parentElement.children.length - 1;
+  var c = this.parentElement.parentElement.children[2];
+  var fns = deviceFunctionsOutput[getDeviceType(this.value)];
   c.removeChild(c.firstChild);
 
   content = document.createElement('select');
@@ -191,7 +224,6 @@ function make_row(cellInfo) {
         content.options.add( new Option(cur.val[0][j], cur.val[0][j]) );
       }
       content.value = cur.val[1];
-      content.onchange = changeSelect;
     } 
     else if (cur.type === "checkBox") {
       content = document.createElement("input");
@@ -270,13 +302,14 @@ header.appendChild( make_row(['Name', 'Log', 'Device', 'Function']) );
   
 for (i=0; i<init.InputVals.length; i++) {
   var isChecked = (init.DataLog.indexOf(init.InputVals[i].Name) != -1);
-  var avail_fns = deviceFunctions[getDeviceType(init.InputVals[i].Device)];
+  var avail_fns = deviceFunctionsInput[getDeviceType(init.InputVals[i].Device)];
   var new_row = make_row( [
     {'type': 'inputText', 'val': init.InputVals[i].Name},
     {'type': 'checkBox', 'val': isChecked},
     {'type': 'selectMenu', 'val': [avail_devs, init.InputVals[i].Device]},
     {'type': 'selectMenu', 'val': [avail_fns, init.InputVals[i].fn]}
   ]);
+  new_row.children[2].children[0].onchange = changeInputSelect;
   tables.InputVals.appendChild(new_row);
   
 }
@@ -285,13 +318,14 @@ var_area.appendChild(tables.InputVals);
 var var_button = document.createElement("input");
 var_button.type = 'button';
 var_button.value = "Add Row";
-var_button.onclick = function(){ 
-var new_row = make_row( [
+var_button.onclick = function() {
+  var new_row = make_row( [
     {'type': 'inputText', 'val': ''},
     {'type': 'checkBox', 'val': 0},
     {'type': 'selectMenu', 'val': [avail_devs, "Select"]},
     {'type': 'selectMenu', 'val': ['','']}
   ]);
+  new_row.children[2].children[0].onchange = changeInputSelect;
   tables.InputVals.appendChild(new_row);};
 
 var_area.appendChild(var_button);
@@ -330,8 +364,9 @@ eval_button.onclick = function(){
 var new_row = make_row( [
     {'type': 'inputText', 'val': ''},
     {'type': 'checkBox', 'val': 0},
-    {'type': 'inputText', 'val': ''} ]);
-  tables.Evals.appendChild(new_row);};
+    {'type': 'inputText', 'val': ''} 
+]);
+tables.Evals.appendChild(new_row);};
 
 eval_area.appendChild(eval_button);
 
@@ -349,13 +384,15 @@ tables.Actions = document.createElement('table');
 var sortableActions = Sortable.create(tables.Actions);
 header = tables.Actions.createTHead();
 header.appendChild( make_row(['Name', 'Device', 'Action']) );
-  
+
 for (i=0; i<init.Actions.length; i++) {
+  var cur_dev = getDeviceType(init.Actions[i].Object);
   var new_row = make_row( [
     {'type': 'inputText', 'val': init.Actions[i].Trigger},
-    //{'type': 'selectMenu', 'val': [["ds1","io1"], init.Actions[i].Object]},
     {'type': 'selectMenu', 'val': [avail_devs, init.Actions[i].Object]},
-    {'type': 'inputText', 'val': init.Actions[i].fn} ]);
+    {'type': 'selectMenu', 'val': [deviceFunctionsOutput[cur_dev], init.Actions[i].fn]}
+  ]);
+  new_row.children[1].children[0].onchange = changeActionSelect;
   tables.Actions.appendChild(new_row);
 }
 act_area.appendChild(tables.Actions);
@@ -364,12 +401,14 @@ var action_button = document.createElement("input");
 action_button.type = 'button';
 action_button.value = "Add Row";
 action_button.onclick = function(){ 
-var new_row = make_row( [
+  var new_row = make_row( [
     {'type': 'inputText', 'val': ''},
-    //{'type': 'selectMenu', 'val': [["ds1","io1"], "Select"]},
     {'type': 'selectMenu', 'val': [avail_devs, "Select"]},
-    {'type': 'inputText', 'val': ''} ]);
-  tables.Actions.appendChild(new_row);};
+    {'type': 'selectMenu', 'val': ['', '']}
+  ]);
+  new_row.children[1].children[0].onchange = changeActionSelect;
+  tables.Actions.appendChild(new_row);
+};
 
 act_area.appendChild(action_button);
 
