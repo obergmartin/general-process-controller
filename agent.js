@@ -34,7 +34,7 @@ var ArraysAreEqual = function(a, b) {
 
 
 function Agent(initf) {
-  
+  this.verbose = false;
   this.initFile = initf;
   this.ini = {};
   this.dev = [];
@@ -63,7 +63,9 @@ Agent.prototype.updateVals = function() {
   //   the output of Device functions: "Name": n, "Device": d, "fn", f
   //   result of an Evaluation: "Name": n, "Eval": e
   
-  console.log('\nUpdating inputValues:');
+  if (this.verbose) {
+    console.log('\nUpdating inputValues:');
+  }
  
   for (var i=0; i<this.InputValFn.length; i++) {
   	var cur = this.InputValFn[i];
@@ -99,8 +101,9 @@ Agent.prototype.updateVals = function() {
         this.inputVals[cur.Name] = funs[fn](a, b);
       }
     }
-    console.log(cur, this.inputVals[cur.Name]);
-    
+    if (this.verbose) {
+      console.log(cur, this.inputVals[cur.Name]);
+    }
   }
 };
 
@@ -110,7 +113,9 @@ Agent.prototype.updateActs = function() {
   // The Action is executed if the specified InputValue (ie Trigger) is true.
   // "Actions": {"Trigger": t, "Object": o, "fn": f}
 
-  console.log('\nupdateActions:');
+  if (this.verbose) {
+    console.log('\nupdateActions:');
+  }
 
   for (var i=0; i<this.Actions.length; i++) {
     var cur_act = this.Actions[i];
@@ -118,10 +123,14 @@ Agent.prototype.updateActs = function() {
     var isTrue = (this.inputVals[cur_act.Trigger] == true);
 
     if (isTrue === true) {
-      console.log(cur_act.Trigger, isTrue, ':', cur_act.Object, cur_act.fn);
+      if (this.verbose) {
+        console.log(cur_act.Trigger, isTrue, ':', cur_act.Object, cur_act.fn);
+      }
       this.dev[cur_act.Object][cur_act.fn]();
     } else {
-      console.log(cur_act.Trigger, isTrue);
+      if (this.verbose) {
+        console.log(cur_act.Trigger, isTrue);
+      }
     }
   }
 };
@@ -131,7 +140,9 @@ Agent.prototype.setup = function() {
   var obj = fs.readFileSync(this.initFile, 'utf-8');
   this.ini = JSON.parse(obj).init;
   
-  console.log('setup...');
+  if (this.verbose) {
+    console.log('setup...');
+  }
   
   for (var i=0; i<this.ini.Devices.length; i++) {
     var cur = this.ini.Devices[i];
@@ -166,19 +177,23 @@ Agent.prototype.setup = function() {
   //this.dev[cur.Name] = obj;
   }
   
-  console.log('Setup: devices');
-  console.log(this.dev);
-  console.log(this.dev.time.getTimeStamp());
-
   this.InputValFn = this.ini.InputVals;
-  console.log(this.InputValFn);
+  
+  if (this.verbose) {
+    console.log('Setup: devices');
+    console.log(this.dev);
+    console.log(this.dev.time.getTimeStamp());
+    console.log(this.InputValFn);
+  }
   
   for (var i=0; i<this.ini.Evals.length; i++) {
       var cur = this.ini.Evals[i];
       //console.log(i, cur);
       this.InputValFn.push({"Name":cur.Name, "Eval": cur.Eval});
   }
-  console.log('evals', this.InputValFn);
+  if (this.verbose) {
+    console.log('evals', this.InputValFn);
+  }
 
   this.Actions = this.ini.Actions;
   
@@ -230,7 +245,9 @@ Agent.prototype.GetRecentLogFile = function() {
   var filt_fun = function(i) { return rexp.test(i); };
   var todays_files = fs.readdirSync('.').filter(filt_fun);
   var file_n = todays_files.length;
-  console.log('getrecentfile: ', todays_files, file_n);
+  if (this.verbose) {
+    console.log('getrecentfile: ', todays_files, file_n);
+  }
   
   if (file_n === 0) {
     return -1;
@@ -268,16 +285,22 @@ Agent.prototype.IterFileName = function() {
   if (basename.indexOf('_') == -1) {
     // first iteration
     this.logfn = basename + '_1.csv';
-    console.log('iterfilename: ', this.logfn);
+    if (this.verbose) {
+      console.log('iterfilename: ', this.logfn);
+    }
   } else {
     // iterate '_1' part of basename
     var parts = basename.split('_');
     parts[1] = String(+parts[1] +1);
     this.logfn = parts.join('_') + '.csv';
-    console.log('iterfilename: ', this.logfn);
+    if (this.verbose) {
+      console.log('iterfilename: ', this.logfn);
+    }
   }
 
-  console.log(this.logfn);    
+  if (this.verbose) {
+    console.log(this.logfn);
+  }
 };
 
 
@@ -296,7 +319,9 @@ Agent.prototype.dataLog = function() {
         }
     }
     dat += '\n';
-    console.log(this.logfn);
+    if (this.verbose) {
+      console.log(this.logfn);
+    }
     fs.appendFileSync(this.logfn, dat);
     
     // A file containing the most recent values is used for displaying.
