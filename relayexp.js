@@ -12,9 +12,9 @@ function RelayExp(addr, channel){
     this.lastOn = 0;
     this.setRelayOff();
     this.lastOff = 0;//+ Date();
-    //relay.init(addr);
+    relay.init(addr);
 }
-    
+
 RelayExp.prototype.getStatus = function(){
     return this.status;
 };
