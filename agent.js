@@ -201,7 +201,7 @@ Agent.prototype.setup = function() {
   // and that a new file is created (with a header) if necessary.
   //console.log('checking...');
 
-  this.logfn = this.GetRecentLogFile();
+  this.logfn = './data/' + this.GetRecentLogFile();
   //console.log(this.logfn);
 
   if (this.logfn == -1) {
@@ -243,7 +243,7 @@ Agent.prototype.GetRecentLogFile = function() {
   var tdate = myclk.makeFn().split('.')[0];
   var rexp = new RegExp(tdate);
   var filt_fun = function(i) { return rexp.test(i); };
-  var todays_files = fs.readdirSync('.').filter(filt_fun);
+  var todays_files = fs.readdirSync('./data/').filter(filt_fun);
   var file_n = todays_files.length;
   if (this.verbose) {
     console.log('getrecentfile: ', todays_files, file_n);
@@ -274,13 +274,13 @@ Agent.prototype.WriteLogHeader = function() {
 
 Agent.prototype.MakeFileName = function() {
     var myclk = new MyClock();
-    this.logfn = myclk.makeFn();
+    this.logfn = './data/' + myclk.makeFn();
 };
 
 
 Agent.prototype.IterFileName = function() {
   // remove file extension
-  var basename = this.logfn.split('.')[0];
+  var basename = this.logfn.split('.csv')[0];
 
   if (basename.indexOf('_') == -1) {
     // first iteration
