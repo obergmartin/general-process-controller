@@ -1,11 +1,5 @@
 //https://github.com/RubaXa/Sortable
-
 //https://www.sitepoint.com/css3-tabs-using-target-selector/
-//var init = window.init2;
-//console.log(init);
-
-var init = {};
-var tables = {};
 
 var deviceFunctionsInput = {
   "DS": [
@@ -46,20 +40,13 @@ var deviceFunctionsOutput = {
   ]
 };
 
-var httpRequest = new XMLHttpRequest();
-httpRequest.onreadystatechange = function() {
-    if (httpRequest.readyState === 4) {
-        if (httpRequest.status === 200) {
-            var data = JSON.parse(httpRequest.responseText);
-            init = data.init;
-            //console.log(init);
-            show_page();
-        }
-    }
+var sort_opts = {
+  filter: '.js-remove',
+  onFilter: function (evt) {
+    var el = editableList.closest(evt.item); 
+    el && el.parentNode.removeChild(el);
+  }
 };
-httpRequest.open('GET', 'init.json');
-httpRequest.send(); 
-
 
 
 function update_page() {
@@ -197,51 +184,6 @@ function changeActionSelect() {
 }
 
 
-function make_row(cellInfo) {
-// Returns a TR element with necessary TD children to be attached to a document.
-//
-  var r = document.createElement('tr');
-  
-  for (var i = 0; i < cellInfo.length; i++) {
-    var cur = cellInfo[i];
-    var new_cell = document.createElement('td');
-    var content = document.createElement('p');
-    if (cur.type === 'inputText'){
-      content = document.createElement("input");
-      content.type = "text";
-      content.value = cur.val;
-    } 
-    else if (cur.type === "inputAddr") {
-      // attach function for when text box is selected
-      //x.parentElement.children[1].children[0].value
-      content = document.createElement("input");
-      content.type = "text";
-      content.value = cur.val;
-    }
-    else if (cur.type === "selectMenu"){
-      content = document.createElement("select");
-      for (var j = 0; j < cur.val[0].length; j++) {
-        content.options.add( new Option(cur.val[0][j], cur.val[0][j]) );
-      }
-      content.value = cur.val[1];
-    } 
-    else if (cur.type === "checkBox") {
-      content = document.createElement("input");
-      content.type = "checkbox";
-      content.checked = cur.val;
-    } 
-    else if (cur.type == null) {
-      content = document.createElement('p');
-      //console.log(cur);
-      content.innerHTML = cur;//['val'];
-    }
-    new_cell.appendChild(content);
-    r.appendChild(new_cell);
-  }
-  return r;
-}
-
-
 function show_page(){
   //
   // Device Setup
@@ -252,13 +194,7 @@ function show_page(){
 
   //make table
   tables.Devices = document.createElement('table');
-  var sortableDevices = Sortable.create(tables.Devices, {
-    filter: '.js-remove',
-    onFilter: function (evt) {
-      var el = editableList.closest(evt.item); // get dragged item
-      el && el.parentNode.removeChild(el);
-    }
-  });
+  var sortableDevices = Sortable.create(tables.Devices, sort_opts);
   var header = tables.Devices.createTHead();
   header.appendChild( make_row(['Name', 'Device', 'Address']) );
 
@@ -295,7 +231,7 @@ function show_page(){
       
   //make table
   tables.InputVals = document.createElement('table');
-  var sortableInputVals = Sortable.create(tables.InputVals);
+  var sortableInputVals = Sortable.create(tables.InputVals, sort_opts);
   header = tables.InputVals.createTHead();
   header.appendChild( make_row(['Name', 'Log', 'Device', 'Function']) );
   
@@ -337,7 +273,7 @@ function show_page(){
 
   //make table
   tables.Evals = document.createElement('table');
-  var sortableEvals = Sortable.create(tables.Evals);
+  var sortableEvals = Sortable.create(tables.Evals, sort_opts);
   header = tables.Evals.createTHead();
   header.appendChild( make_row(['Name', 'Log', 'Eval']) );
   
@@ -417,6 +353,8 @@ function show_page(){
 
   tail_area.appendChild(update_button);
 }
+
+
 
 
 

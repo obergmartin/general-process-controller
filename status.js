@@ -6,7 +6,7 @@ var timetext = document.getElementById('timetext');
 timetext.innerText="Last reading at: " + recent.Time;
 temptext.innerText="Sensor Temp: " + recent.temp1;
 setpointtext.innerText="Setpoint: " + recent.warmPt;
-relaytext.innerText="The relay is " + ["Off", "On"][+recent.isOn];
+relaytext.innerText="The relay is: " + ["Off", "On"][+recent["isOn]"]];
 temp2text.innerText="Tap Temp: " + recent.temp2;
 //floortext.innerText="The floor is currently " + ["nice and dry.", "FLOODED!"][0];
 
