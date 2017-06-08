@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<TITLE>Control Setup</TITLE>
+<TITLE>Status Config</TITLE>
 <LINK rel='stylesheet' type='text/css' href='style.css'>
 </HEAD>
 
@@ -8,7 +8,7 @@
 
 <script src="./Sortable.min.js"></script>
 
-<h2>Control Setup</h2>
+<h2>Status Config</h2>
 <script type="text/javascript" src="links.js"></script>
 <script type="text/javascript" src="recent.json"></script>
 <script type="text/javascript" src="./makerow.js"></script>
@@ -38,8 +38,8 @@
   
   httpRequest.open('GET', 'status.json', false);
   httpRequest.send();
-  var stat = JSON.parse(httpRequest.responseText);
-  
+  var stat = JSON.parse(httpRequest.responseText).stat;
+  console.log(stat);  
   
   
   var var_area = document.getElementById("var_area");
@@ -111,7 +111,7 @@ function update_page() {
       alert(xhr.responseText);
     }
   };
-  var dataSend = JSON.stringify(dat, null, ' ');
+  var dataSend = JSON.stringify({"stat": dat}, null, ' ');
   console.log(dataSend);
   xhr.send(dataSend);
   window.location.href = "statusedit.html";

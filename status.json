@@ -1,0 +1,26 @@
+{
+ "stat": {
+  "temp1": {
+   "Label": "Sensor Temp: ",
+   "Value": ""
+  },
+  "temp2": {
+   "Label": "Tap temp: ",
+   "Value": ""
+  },
+  "isOn]": {
+   "Label": "The Relay is: ",
+   "Value": {
+    "0": "Off",
+    "1": "On"
+   }
+  },
+  "fanIsOn": {
+   "Label": "The fan is: ",
+   "Value": {
+    "0": "Off",
+    "1": "On"
+   }
+  }
+ }
+}
