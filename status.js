@@ -4,6 +4,11 @@ var httpRequest = new XMLHttpRequest();
 httpRequest.open('GET', 'status.json', false);
 httpRequest.send();
 var stat = JSON.parse(httpRequest.responseText).stat;
+var titleText = JSON.parse(httpRequest.responseText).title;
+document.title = titleText;
+
+var title_area = document.getElementById('title_text');
+title_area.innerText = titleText;
 
 var area = document.getElementById('main');
 
