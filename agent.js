@@ -34,7 +34,7 @@ var ArraysAreEqual = function(a, b) {
 
 
 function Agent(initf) {
-  this.verbose = false;
+  this.verbose = true;
   this.initFile = initf;
   this.ini = {};
   this.dev = [];
@@ -201,7 +201,7 @@ Agent.prototype.setup = function() {
   // and that a new file is created (with a header) if necessary.
   //console.log('checking...');
 
-  this.logfn = './data/' + this.GetRecentLogFile();
+  this.logfn = this.GetRecentLogFile();
   //console.log(this.logfn);
 
   if (this.logfn == -1) {
@@ -244,6 +244,7 @@ Agent.prototype.GetRecentLogFile = function() {
   var rexp = new RegExp(tdate);
   var filt_fun = function(i) { return rexp.test(i); };
   var todays_files = fs.readdirSync('./data/').filter(filt_fun);
+  console.log(todays_files);
   var file_n = todays_files.length;
   if (this.verbose) {
     console.log('getrecentfile: ', todays_files, file_n);
@@ -268,13 +269,13 @@ Agent.prototype.WriteLogHeader = function() {
     }
   }
   header += '\n';
-  fs.appendFileSync(this.logfn, header);
+  fs.appendFileSync('./data/' + this.logfn, header);
 };
 
 
 Agent.prototype.MakeFileName = function() {
     var myclk = new MyClock();
-    this.logfn = './data/' + myclk.makeFn();
+    this.logfn = myclk.makeFn();
 };
 
 
@@ -299,7 +300,7 @@ Agent.prototype.IterFileName = function() {
   }
 
   if (this.verbose) {
-    console.log(this.logfn);
+    console.log('./data/' + this.logfn);
   }
 };
 
@@ -320,9 +321,9 @@ Agent.prototype.dataLog = function() {
     }
     dat += '\n';
     if (this.verbose) {
-      console.log(this.logfn);
+      console.log('./data/' + this.logfn);
     }
-    fs.appendFileSync(this.logfn, dat);
+    fs.appendFileSync('./data/' + this.logfn, dat);
     
     // A file containing the most recent values is used for displaying.
     fs.writeFileSync('recent.json', 'recent = '+JSON.stringify(this.inputVals)+'\n');
