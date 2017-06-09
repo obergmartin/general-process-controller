@@ -13,6 +13,10 @@
 <script type="text/javascript" src="recent.json"></script>
 <script type="text/javascript" src="./makerow.js"></script>
 
+<div id='title_area' class='block_container'>
+<b>Title</b>
+</div><br>
+
 <div id='var_area' class='block_container'>
 <b>Variables</b>
 </div><br>
@@ -39,11 +43,22 @@
   httpRequest.open('GET', 'status.json', false);
   httpRequest.send();
   var stat = JSON.parse(httpRequest.responseText).stat;
+  var title_text = JSON.parse(httpRequest.responseText).title;
   console.log(stat);  
   
   
-  var var_area = document.getElementById("var_area");
-  var_area.align = 'left';
+  var title_area = document.getElementById("title_area");
+  title_area.align = 'left';
+  
+  var title_input = document.createElement('input');
+  title_input.type = 'text';
+  title_input.value = title_text;
+  title_area.appendChild(title_input);
+  
+
+  
+  
+  
       
   //make table
   table = document.createElement('table');
@@ -53,6 +68,21 @@
   
   for (i = 0; i < init.InputVals.length; i++) {
   	var cur_name = init.InputVals[i].Name;
+  	//var cur_value = init.InputVals[i].Value;
+  	var cur_label = (stat.hasOwnProperty(cur_name)) ? stat[cur_name].Label : '';
+    var cur_value = (stat.hasOwnProperty(cur_name)) ? JSON.stringify(stat[cur_name].Value) : '';
+    cur_value = (cur_value.length <= 2) ? '' : cur_value; // text is blank if "" returned above
+    
+    var new_row = make_row( [
+      {'type': 'inputText', 'val': cur_label},
+      {'type': 'inputText', 'val': cur_name},
+      {'type': 'inputText', 'val': cur_value}
+    ]);
+    table.appendChild(new_row);
+
+  }
+  for (i = 0; i < init.Evals.length; i++) {
+  	var cur_name = init.Evals[i].Name;
   	//var cur_value = init.InputVals[i].Value;
   	var cur_label = (stat.hasOwnProperty(cur_name)) ? stat[cur_name].Label : '';
     var cur_value = (stat.hasOwnProperty(cur_name)) ? JSON.stringify(stat[cur_name].Value) : '';
@@ -76,6 +106,7 @@
 
 function update_page() {
   dat = {};
+  titleText = title_input.value;
   
   for (var i = 1; i < table.rows.length; i++) {
     var r = {};
@@ -111,7 +142,7 @@ function update_page() {
       alert(xhr.responseText);
     }
   };
-  var dataSend = JSON.stringify({"stat": dat}, null, ' ');
+  var dataSend = JSON.stringify({"stat": dat, "title": titleText}, null, ' ');
   console.log(dataSend);
   xhr.send(dataSend);
   window.location.href = "statusedit.html";
