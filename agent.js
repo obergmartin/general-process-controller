@@ -215,7 +215,7 @@ Agent.prototype.setup = function() {
     // Has program just started?
     if (this.logVars.length === 0) {
       // program just starting.  Need to compare with existing file.
-      var fh = fs.readFileSync(this.logfn, 'utf-8').split('\n')[0];
+      var fh = fs.readFileSync('./data/' + this.logfn, 'utf-8').split('\n')[0];
       var prevVars = fh.split(',');
       if (!ArraysAreEqual(prevVars, this.ini.DataLog)) {
         this.logVars = this.ini.DataLog;
