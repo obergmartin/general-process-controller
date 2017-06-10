@@ -148,7 +148,27 @@ http.createServer(function (request, response) {
         response.end('Done!');
       });
     }
-    
+    else if (request.url === "/plotedit.html") {
+      // Data submitted via POST from plotedit.html is to replace the plotedit.json
+      // file used by makeplot.js
+      
+      var requestBody = '';
+      request.on('data', function(data) {
+        requestBody += data;
+        if(requestBody.length > 1e7) {
+          response.writeHead(413, 'Request Entity Too Large', {'Content-Type': 'text/html'});
+          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+        }
+      });
+      request.on('end', function() {
+        console.log(requestBody);
+        var formData = JSON.parse(requestBody);
+        console.log(formData);
+        fs.writeFile('plotedit.json', requestBody, 'utf8');
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.end('Done!');
+      });
+    }
     else if (request.url === '/switches.html') {
       // handle events to switch io pins
     }
