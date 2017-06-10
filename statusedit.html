@@ -142,11 +142,12 @@ function update_page() {
       alert(xhr.responseText);
     }
   };
+  
   var dataSend = JSON.stringify({"stat": dat, "title": titleText}, null, ' ');
   console.log(dataSend);
+  
   xhr.send(dataSend);
   window.location.href = "statusedit.html";
-  
 }
 
 </script>
