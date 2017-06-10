@@ -31,6 +31,12 @@ function make_row(cellInfo) {
       content.type = "checkbox";
       content.checked = cur.val;
     } 
+    else if (cur.type === "radio") {
+      content = document.createElement("input");
+      content.type = "radio";
+      content.setAttribute('name', cur.val[0]);
+      content.checked = cur.val[1];
+    }
     else if (cur.type == null) {
       content = document.createElement('p');
       //console.log(cur);
@@ -41,3 +47,4 @@ function make_row(cellInfo) {
   }
   return r;
 }
+
