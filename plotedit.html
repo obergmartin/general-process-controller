@@ -101,10 +101,8 @@ function update_page() {
   var dataSend = JSON.stringify({"plotVars": dat}, null, ' ');
   console.log(dataSend);
 
-  window.location.href = "plotedit.html";
   xhr.send(dataSend);
-  
-  
+  window.location.href = "plotedit.html";
 }
 
 </script>
