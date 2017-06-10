@@ -14,7 +14,7 @@ var area = document.getElementById('main');
 
 for (var v in stat){
   cur = document.createElement("p");
-  console.log(stat[v]);
+  //console.log(stat[v]);
   cur.innerText = stat[v].Label;
   if (stat[v].Value === '') {
     cur.innerText += recent[v];
