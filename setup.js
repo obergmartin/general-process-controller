@@ -19,7 +19,8 @@ var deviceFunctionsInput = {
     "getMinutesOff"
   ],
   "MyClock": [
-    "getTimeStamp"
+    "getTimeStamp",
+    "getTime24"
   ]
 };
 

@@ -14,6 +14,13 @@ MyClock.prototype.getTimeStamp = function(){
     return pad(d.getHours()) + ":" + pad(d.getMinutes());
 }
 
+MyClock.prototype.getTime24 = function(){
+    var d = new Date();
+    var h = d.getHours();
+    var m = d.getMinutes();
+    return d + (m / 60);
+}
+
 MyClock.prototype.makeFn = function(){
 	var d = new Date();
     //return d.toISOString().substr(0,10)+".csv";
