@@ -34,7 +34,7 @@ var ArraysAreEqual = function(a, b) {
 
 
 function Agent(initf) {
-  this.verbose = true;
+  this.verbose = false;
   this.initFile = initf;
   this.ini = {};
   this.dev = [];

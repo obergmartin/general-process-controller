@@ -15,6 +15,7 @@ console.log("Starting Agent...");
 
 /**
  * Self-adjusting interval to account for drifting
+ * https://stackoverflow.com/questions/29971898/how-to-create-an-accurate-timer-in-javascript/44337628#44337628
  * 
  * @param {function} workFunc  Callback containing the work to be done
  *                             for each interval
@@ -47,11 +48,6 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
         timeout = setTimeout(step, Math.max(0, that.interval-drift));
     }
 }
-
-// Define the work to be done
-//var doWork = function() {
-//    console.log(++justSomeNumber);
-//};
 
 // Define what to do if something goes wrong
 var doError = function() {
