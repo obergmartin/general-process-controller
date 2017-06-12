@@ -7,10 +7,56 @@ var ChildProcess = require('child_process');
 
 var re_date = /^\/\d{4}-\d{2}-\d{2}/;
 
+
 function getPathFromUrl(url) {
   return url.split("?")[0];
   //return url.split("?")[0].split("#")[0];
 }
+
+var updatePlotVars = function(LogData) {
+  //console.log("updating plotedit.json");
+  plotVars = JSON.parse(fs.readFileSync('./plotedit.json')).plotVars;
+
+  // Add new variables to plotVars
+  var changes = false;
+  for (var i = 0; i < LogData.length; i++) {
+    d = LogData[i];
+    //console.log(d);
+    if (!(plotVars.hasOwnProperty(d))) {
+      //console.log(d);
+      changes = true;
+      plotVars[d] = {
+        Axis: 'y',
+        Label: d,
+        isBool: false,
+        Options: ''
+      };
+      //console.log(plotVars);
+    }
+  }
+
+  // Remove old variables from plotVars
+  for (var v in plotVars) {
+    if (LogData.indexOf(v) < 0) {
+      //console.log(d);
+      changes = true;
+      //console.log('removing: ');
+      //console.log(v);
+      delete plotVars[v]
+      //console.log(plotVars);
+    }
+  }
+
+  // Write if any changes
+  if (changes) {
+    console.log("updating plotedit.json");
+    // Write file
+    var toWrite = JSON.stringify({"plotVars": plotVars}, null, ' ');
+    fs.writeFileSync('./plotedit.json', toWrite, 'utf8');
+  }
+
+}
+
 
 var ConvertCSV = function(fn) {
   // Data are saved in CSV format space efficiency and for easy appending of 
@@ -120,10 +166,13 @@ http.createServer(function (request, response) {
         }
       });
       request.on('end', function() {
-        console.log(requestBody);
+        //console.log(requestBody);
         var formData = JSON.parse(requestBody);
-        console.log(formData);
-        fs.writeFile('init.json', requestBody, 'utf8');
+        //console.log(formData);
+        // Write new data
+        fs.writeFileSync('init.json', requestBody, 'utf8');
+        // Update plotedit.json
+        updatePlotVars(formData.init.DataLog);
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.end('Done!');
       });
@@ -140,9 +189,9 @@ http.createServer(function (request, response) {
         }
       });
       request.on('end', function() {
-        console.log(requestBody);
+        //console.log(requestBody);
         var formData = JSON.parse(requestBody);
-        console.log(formData);
+        //console.log(formData);
         fs.writeFile('status.json', requestBody, 'utf8');
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.end('Done!');
@@ -161,9 +210,9 @@ http.createServer(function (request, response) {
         }
       });
       request.on('end', function() {
-        console.log(requestBody);
+        //console.log(requestBody);
         var formData = JSON.parse(requestBody);
-        console.log(formData);
+        //console.log(formData);
         fs.writeFile('plotedit.json', requestBody, 'utf8');
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.end('Done!');
