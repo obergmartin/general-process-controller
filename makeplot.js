@@ -10,6 +10,11 @@ var pltColors = [
     window.chartColors.green,
     window.chartColors.red
 ]; 
+
+var config = {};
+var axisOpts = [];
+var axisids = [];
+var plotYaxes = [];
     
 plot_it = function() {
   
@@ -20,15 +25,44 @@ plot_it = function() {
   
   var k = -1; // for indexing color
   
+  var curAxisOption = 'L1';
+  var curYaxis = {};
+  var defYaxis = {
+    position: "left",
+    //id: curAxisOption
+  };
+  
+  var rightAxis = {
+    position: "right",
+    id: "R1",
+    ticks: {
+      fontColor: window.chartColors.red, // this here
+      stepSize: 1,
+      display: false
+    },
+    gridLines: {
+      display: false,
+    }
+  };
+
+        
+  
   for (var v in plotVars) {
-    //if (cols[i] === 'Time') {
     if (plotVars[v].Axis === "x") {
       xdata = data[v];
-      var x_label = plotVars[v].Label;
-    } 
+      
+      var plotXaxes = [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: plotVars[v].Label
+          }
+      }];
+    }
     else {
       k += 1;
       var yaxid = plotVars[v].Options;
+      console.log(yaxid);
 
       //var new_data = {};
 
@@ -41,8 +75,14 @@ plot_it = function() {
           borderColor: pltColors[k],
           backgroundColor: pltColors[k].replace(')', ', 0.2)').replace('rgb', 'rgba'),
           lineTension: 0,
-          yAxisID: yaxid,
+          yAxisID: yaxid
         }
+        curYaxis = rightAxis;
+        if (axisids.indexOf(yaxid) < 0) {
+          //axisids.push(yaxid);
+          plotYaxes.push(curYaxis);
+        }
+
       }
       else {
         var new_data = {
@@ -55,17 +95,26 @@ plot_it = function() {
           lineTension: 0,
           yAxisID: yaxid,
         }
-      
+        curYaxis = {
+          position: "left",
+          ticks: { fontColor: pltColors[k] },
+          id: yaxid
+        };
+        //curYaxis.id = yaxid;
+        console.log(curYaxis);
+        if (axisids.indexOf(yaxid) < 0) {
+          axisids.push(yaxid);
+          plotYaxes.push(curYaxis);
+        }
       }
       
-      // Add Axes here:
-      // plotVars[v].Options can be L1, L2...
-
       ydata.push(new_data);
+      
     }
   }
+  
 
-  var config = {
+  config = {
     data: {
       labels: xdata,
       datasets: ydata
@@ -86,32 +135,17 @@ plot_it = function() {
         intersect: true
       },
       scales: {
-        xAxes: [{
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: x_label
-          }
-        }],
-        yAxes: [
-        {
-          position: "left",
-          "id": "L1"
-        },{
-          position: "right",
-          "id": "R1",
-          ticks: {
-            fontColor: window.chartColors.red, // this here
-            stepSize: 1,
-            display: false
-          },
-          gridLines: {
-            display: false,
-          }
-        }]
+        xAxes: plotXaxes,
+        yAxes: plotYaxes
       }
     }
   };
+  
+  if (axisids.length === 1) {
+    config.options.scales.yAxes[0].ticks.fontColor = "rgb(51,51,51)";
+    console.log("gray axis");
+  }
+
 
   var ctx = document.getElementById("canvas").getContext("2d");
   window.myLine = new Chart(ctx, config);
