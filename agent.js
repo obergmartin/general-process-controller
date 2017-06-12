@@ -17,6 +17,7 @@ funs.or =  function(a,b){ return a || b; };
 funs.add = function(a,b){ return a + b; };
 funs.sub = function(a,b){ return a - b; };
 funs.diff= function(a,b){ return a - b < 0 ? b - a : a - b; };
+funs.not = function(a)  { return !a; };
 
 var ArraysAreEqual = function(a, b) {
   if (a.length != b.length) {
@@ -94,11 +95,15 @@ Agent.prototype.updateVals = function() {
         var a = (cur.Eval[1] in this.inputVals) 
           ? this.inputVals[cur.Eval[1]]
           : cur.Eval[1];
-        var b = (cur.Eval[2] in this.inputVals)
-          ? this.inputVals[cur.Eval[2]]
-          : cur.Eval[2];
-        
-        this.inputVals[cur.Name] = funs[fn](a, b);
+        if (cur.Eval.length === 3) {
+          var b = (cur.Eval[2] in this.inputVals)
+            ? this.inputVals[cur.Eval[2]]
+            : cur.Eval[2];
+          this.inputVals[cur.Name] = funs[fn](a, b);
+        }
+        else {
+          this.inputVals[cur.Name] = funs[fn](a);
+        }
       }
     }
     if (this.verbose) {
