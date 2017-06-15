@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const DS = require('./ds');
+const DHT = require('./dht22');
 const Gpio = require('./pinio');
 const RelayExp = require('./relayexp');
 const MyClock = require('./myclock');
