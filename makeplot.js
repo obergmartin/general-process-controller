@@ -5,21 +5,23 @@ httpRequest.send();
 var plotVars = JSON.parse(httpRequest.responseText).plotVars;
 //console.log(plotVars);  
    
-var pltColors = [
+var pltColors = [];
+for (var i in window.chartColors) { pltColors.push(window.chartColors[i]); }
+var foo = [
     window.chartColors.blue,
     window.chartColors.green,
-    window.chartColors.red
+    window.chartColors.red,
+    window.chartColors.yellow
 ]; 
 
 var config = {};
 var axisOpts = [];
 var axisids = [];
 var plotYaxes = [];
+
+var sideKey = {"R": "right", "L": "left"};
     
 plot_it = function() {
-  
-
-  var cols = Object.keys(data);
   var xdata = [];
   var ydata = [];
   
@@ -48,6 +50,7 @@ plot_it = function() {
         
   
   for (var v in plotVars) {
+    // There is only one X axis
     if (plotVars[v].Axis === "x") {
       xdata = data[v];
       
@@ -59,8 +62,11 @@ plot_it = function() {
           }
       }];
     }
+    // Y axes
     else {
       k += 1;
+      if (k >= pltColors.length) { k = 0; }
+      
       var yaxid = plotVars[v].Options;
       console.log(yaxid);
 
@@ -77,12 +83,15 @@ plot_it = function() {
           lineTension: 0,
           yAxisID: yaxid
         }
-        curYaxis = rightAxis;
-        if (axisids.indexOf(yaxid) < 0) {
-          //axisids.push(yaxid);
-          plotYaxes.push(curYaxis);
-        }
-
+        cur_id = yaxid;
+        cur_ticks = {
+          "min": 0,
+          "max": 1,
+          fontColor: pltColors[k],
+          stepSize: 1,
+          display: true
+        };
+        cur_gridlines = {display: false };
       }
       else {
         var new_data = {
@@ -95,19 +104,24 @@ plot_it = function() {
           lineTension: 0,
           yAxisID: yaxid,
         }
-        curYaxis = {
-          position: "left",
-          ticks: { fontColor: pltColors[k] },
-          id: yaxid
-        };
+        cur_id = yaxid;
+        cur_ticks = { fontColor: pltColors[k] };
+        cur_gridlines = { display: true };
+
         //curYaxis.id = yaxid;
         console.log(curYaxis);
-        if (axisids.indexOf(yaxid) < 0) {
+        
+      }
+      curYaxis = {
+        id: cur_id,
+        position: sideKey[plotVars[v].Options[0]],
+        ticks: cur_ticks,
+        gridLines: cur_gridlines
+      }
+      if (axisids.indexOf(yaxid) < 0) {
           axisids.push(yaxid);
           plotYaxes.push(curYaxis);
-        }
       }
-      
       ydata.push(new_data);
       
     }
