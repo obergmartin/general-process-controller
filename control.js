@@ -9,7 +9,7 @@ var mainLoop = function() {
 };
 
 console.log("Starting Agent...");
-//mainLoop();
+mainLoop();
 
 //setInterval(mainLoop, 60000);
 
