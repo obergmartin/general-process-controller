@@ -179,6 +179,17 @@ Agent.prototype.setup = function() {
       }
       //console.log(obj);
     }
+    else if (cur.Type === 'DHT'){
+      // if name not in list of this.dev, then add it
+      if (!(cur.Name in this.dev)){
+        this.dev[cur.Name] = new DHT(cur.addr);
+      }
+      // else update values
+      else {
+        this.dev[cur.Name].readSensor();
+      }
+    }
+
   //this.dev[cur.Name] = obj;
   }
   
