@@ -1,11 +1,16 @@
 'use strict';
 
+const os = require('os');
 const fs = require('fs');
 const DS = require('./ds');
 const DHT = require('./dht22');
 const Gpio = require('./pinio');
-const RelayExp = require('./relayexp');
 const MyClock = require('./myclock');
+
+if (os.arch() === 'mipsel') {
+  // relay expansion board is only compatable with Omega boards
+  const RelayExp = require('./relayexp');
+}
 
 var funs = {};
 funs.eq =  function(a,b){ return a == b; };
@@ -165,7 +170,7 @@ Agent.prototype.setup = function() {
         this.dev[cur.Name] = new Gpio(cur.addr);
   	  }
     }
-    else if (cur.Type === 'relayexp'){ 
+    else if ((cur.Type === 'relayexp') & (typeof RelayExp !== 'undefined')) { 
       if (!(cur.Name in this.dev)) {
       	var parm = cur.addr.split(',');
       	//var obj = new RelayExp(parm[0], parm[1]);
@@ -343,7 +348,8 @@ Agent.prototype.dataLog = function() {
     fs.appendFileSync('./data/' + this.logfn, dat);
     
     // A file containing the most recent values is used for displaying.
-    fs.writeFileSync('recent.json', 'recent = '+JSON.stringify(this.inputVals)+'\n');
+    var dataWrite = 'recent = ' + JSON.stringify(this.inputVals, null, ' ');
+    fs.writeFileSync('recent.json', dataWrite);
 };
 
 
