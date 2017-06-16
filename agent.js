@@ -266,7 +266,9 @@ Agent.prototype.GetRecentLogFile = function() {
   var rexp = new RegExp(tdate);
   var filt_fun = function(i) { return rexp.test(i); };
   var todays_files = fs.readdirSync('./data/').filter(filt_fun);
-  console.log(todays_files);
+  if (this.verbose) {
+    console.log(todays_files);
+  }
   var file_n = todays_files.length;
   if (this.verbose) {
     console.log('getrecentfile: ', todays_files, file_n);
