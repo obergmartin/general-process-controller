@@ -1,0 +1,26 @@
+.block_container{
+  position: relative;
+  background-color: rgb(150,190,190);
+  display: block;
+  width: 440px;
+  
+}
+
+.var_container{
+  position: relative;
+  background-color: rgb(221,221,221);
+  display: inline-block;
+  
+}
+
+.right_side{
+  position: relative;
+  float: right;
+}
+
+.named_input{
+  background-color: rgb(190,190,190);
+  margin: 5px auto;
+  float: left;
+  
+}
