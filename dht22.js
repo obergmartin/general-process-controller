@@ -12,13 +12,13 @@ DHT22.prototype.readSensor = function() {
     // Temp=16.7*  Humidity=64.0%
     
     // 'Temp=' is 5 characters
-    c = result.substr(5, result.indexOf('*')-5);
+    var c = result.substr(5, result.indexOf('*')-5);
     this.tempC = parseFloat(c);
     
     // 'Humidity=' is 9 characters    
-    beg = result.indexOf('Humidity=') + 9;
-    n = result.indexOf('%') - beg;
-    h = result.substr(beg, n);
+    var beg = result.indexOf('Humidity=') + 9;
+    var n = result.indexOf('%') - beg;
+    var h = result.substr(beg, n);
     this.humid = parseFloat(h);
 }
 
