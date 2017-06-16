@@ -8,11 +8,6 @@ var mainLoop = function() {
     a.dataLog();
 };
 
-console.log("Starting Agent...");
-mainLoop();
-
-//setInterval(mainLoop, 60000);
-
 /**
  * Self-adjusting interval to account for drifting
  * https://stackoverflow.com/questions/29971898/how-to-create-an-accurate-timer-in-javascript/44337628#44337628
@@ -54,6 +49,8 @@ var doError = function() {
     console.warn('The drift exceeded the interval.');
 };
 
+console.log("Starting Agent...");
+mainLoop();
 // (The third argument is optional)
 var ticker = new AdjustingInterval(mainLoop, 60000, doError);
 ticker.start();
