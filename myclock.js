@@ -18,7 +18,7 @@ MyClock.prototype.getTime24 = function(){
     var d = new Date();
     var h = d.getHours();
     var m = d.getMinutes();
-    return d + (m / 60);
+    return h + (m / 60);
 }
 
 MyClock.prototype.makeFn = function(){
