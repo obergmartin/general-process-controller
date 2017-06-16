@@ -2,6 +2,11 @@
 //https://www.sitepoint.com/css3-tabs-using-target-selector/
 
 var deviceFunctionsInput = {
+  "DHT": [
+    "getHumid",
+    "getTempC",
+    "getTempF"
+  ],
   "DS": [
     "getTempC",
     "getTempF"
@@ -24,6 +29,11 @@ var deviceFunctionsInput = {
   ]
 };
 
+var deviceTypes = [];
+for (var i in deviceFunctionsInput) {
+  deviceTypes.push(i);
+}
+
 var deviceFunctionsOutput = {
   "relayexp": [
     "setRelayOn",
@@ -34,6 +44,9 @@ var deviceFunctionsOutput = {
     "setRelayOff"
   ],
   "DS": [
+    " "
+  ],
+  "DHT": [
     " "
   ],
   "MyClock": [
@@ -203,7 +216,7 @@ function show_page(){
   for (var i = 0; i < init.Devices.length; i++) {
     var new_row = make_row( [
       {'type': 'inputText', 'val': init.Devices[i].Name},
-      {'type': 'selectMenu', 'val': [["DS","gpio", "relayexp","MyClock"], init.Devices[i].Type]},
+      {'type': 'selectMenu', 'val': [deviceTypes, init.Devices[i].Type]},
       {'type': 'inputText', 'val': init.Devices[i].addr} ]);
     tables.Devices.appendChild(new_row);
     avail_devs.push(init.Devices[i].Name);
@@ -217,7 +230,7 @@ function show_page(){
   dev_button.onclick = function(){ 
     var new_row = make_row( [
     {'type': 'inputText', 'val': ''},
-    {'type': 'selectMenu', 'val': [["DS","gpio", "relayexp","MyClock"], "Select"]},
+    {'type': 'selectMenu', 'val': [deviceTypes, ""]},
     {'type': 'inputText', 'val': ''} ]);
     tables.Devices.appendChild(new_row);
   };
