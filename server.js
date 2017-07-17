@@ -8,6 +8,11 @@ var ChildProcess = require('child_process');
 var re_date = /^\/\d{4}-\d{2}-\d{2}/;
 
 
+
+html_dir = process.argv[2]
+base_dir = process.argv[3]
+console.log(base_dir);
+
 function getPathFromUrl(url) {
   return url.split("?")[0];
   //return url.split("?")[0].split("#")[0];
@@ -15,7 +20,7 @@ function getPathFromUrl(url) {
 
 var updatePlotVars = function(LogData) {
   //console.log("updating plotedit.json");
-  plotVars = JSON.parse(fs.readFileSync('./plotedit.json')).plotVars;
+  plotVars = JSON.parse(fs.readFileSync(base_dir+'plotedit.json')).plotVars;
 
   // Add new variables to plotVars
   var changes = false;
@@ -52,7 +57,7 @@ var updatePlotVars = function(LogData) {
     console.log("updating plotedit.json");
     // Write file
     var toWrite = JSON.stringify({"plotVars": plotVars}, null, ' ');
-    fs.writeFileSync('./plotedit.json', toWrite, 'utf8');
+    fs.writeFileSync(base_dir+'plotedit.json', toWrite, 'utf8');
   }
 
 }
@@ -88,13 +93,14 @@ var GenLogList = function() {
   // Generates a list of of log files based on filenames that have a date format
   // e.g. 2017-01-01.csv
   // This list is used to populate a dropdown menu in loghistory.html
-  var f = fs.readdirSync('./data/');
+  var f = fs.readdirSync(base_dir+'data/');
   f = f.filter(function(i) { return /^\d{4}-\d{2}-\d{2}/.test(i); });
   return "loglist = " + JSON.stringify(f);
 }
 
 
 var GenDSSensorList = function() {
+  // TODO: make an alias to be platform independent
   r = ChildProcess.execSync('cat /sys/devices/w1_bus_master1/w1_master_slaves').toString().trim().split('\n');
   return "dslist = " + JSON.stringify(r);
 }
@@ -115,7 +121,7 @@ http.createServer(function (request, response) {
       // response.
       //console.log(request.url);
       //console.log('json');
-      fs.readFile('./data/'+request.url, 'utf-8', function(error,data){
+      fs.readFile(base_dir+'data/'+request.url, 'utf-8', function(error,data){
         //console.log(request.url);
         if(error){
              response.writeHead(404, {"Content-type":"text/html"});
@@ -135,7 +141,8 @@ http.createServer(function (request, response) {
       response.end(GenDSSensorList());
     } else {
       // This is the normal page request
-      fs.readFile('.'+getPathFromUrl(request.url), function(error,data){
+      console.log(request.url);
+      fs.readFile(html_dir + getPathFromUrl(request.url), function(error,data){
       //console.log(params.path);
       //console.log(request.url);
       //console.log(getPathFromUrl(request.url));
@@ -170,7 +177,7 @@ http.createServer(function (request, response) {
         var formData = JSON.parse(requestBody);
         //console.log(formData);
         // Write new data
-        fs.writeFileSync('init.json', requestBody, 'utf8');
+        fs.writeFileSync(base_dir+'init.json', requestBody, 'utf8');
         // Update plotedit.json
         updatePlotVars(formData.init.DataLog);
         response.writeHead(200, {'Content-Type': 'text/html'});
@@ -192,7 +199,7 @@ http.createServer(function (request, response) {
         //console.log(requestBody);
         var formData = JSON.parse(requestBody);
         //console.log(formData);
-        fs.writeFile('status.json', requestBody, 'utf8');
+        fs.writeFile(base_dir+'status.json', requestBody, 'utf8');
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.end('Done!');
       });
@@ -213,7 +220,7 @@ http.createServer(function (request, response) {
         //console.log(requestBody);
         var formData = JSON.parse(requestBody);
         //console.log(formData);
-        fs.writeFile('plotedit.json', requestBody, 'utf8');
+        fs.writeFile(base_dir+'plotedit.json', requestBody, 'utf8');
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.end('Done!');
       });
