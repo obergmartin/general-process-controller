@@ -1,17 +1,20 @@
 //http://stackoverflow.com/questions/24468459/sending-a-json-to-server-and-retrieving-a-json-in-return-without-jquery
 //http://stackoverflow.com/questions/15427220/how-to-handle-post-request-in-node-js
 var http = require('http');
-var url = require("url");
+var url = require('url');
 var fs = require('fs');
 var ChildProcess = require('child_process');
 
 var re_date = /^\/\d{4}-\d{2}-\d{2}/;
 
+var html404 = '<!doctype html><html><head><title>404</title></head><body>404: Resource Not Found</body></html>';
+var html405 = '<!doctype html><html><head><title>405</title></head><body>405: Method Not Supported</body></html>';
+var html413 = '<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>';
 
-
-html_dir = process.argv[2]
-base_dir = process.argv[3]
+//var html_dir = process.argv[2];
+var base_dir = process.argv[2];
 console.log(base_dir);
+
 
 function getPathFromUrl(url) {
   return url.split("?")[0];
@@ -95,14 +98,16 @@ var GenLogList = function() {
   // This list is used to populate a dropdown menu in loghistory.html
   var f = fs.readdirSync(base_dir+'data/');
   f = f.filter(function(i) { return /^\d{4}-\d{2}-\d{2}/.test(i); });
-  return "loglist = " + JSON.stringify(f);
+  return JSON.stringify({"loglist": f});
 }
 
 
 var GenDSSensorList = function() {
-  // TODO: make an alias to be platform independent
   r = ChildProcess.execSync('cat /sys/devices/w1_bus_master1/w1_master_slaves').toString().trim().split('\n');
-  return "dslist = " + JSON.stringify(r);
+  var tosend = {"dslist": r};
+  //console.log(tosend);
+  return JSON.stringify(tosend);
+  //return "";
 }
 
 
@@ -114,7 +119,7 @@ http.createServer(function (request, response) {
     if (request.url === "/favicon.ico") {
       // Don't have an icon for any pages yet, won't actually be requested.
       response.writeHead(404, {'Content-Type': 'text/html'});
-      response.write('<!doctype html><html><head><title>404</title></head><body>404: Resource Not Found</body></html>');
+      response.write(html404);
       response.end();
     } else if (re_date.test(request.url)) {
       // if a log file is requested, convert it to Json and return it in the 
@@ -142,7 +147,7 @@ http.createServer(function (request, response) {
     } else {
       // This is the normal page request
       console.log(request.url);
-      fs.readFile(html_dir + getPathFromUrl(request.url), function(error,data){
+      fs.readFile(base_dir + getPathFromUrl(request.url), function(error,data){
       //console.log(params.path);
       //console.log(request.url);
       //console.log(getPathFromUrl(request.url));
@@ -160,81 +165,42 @@ http.createServer(function (request, response) {
     }
   } else if (request.method === "POST") {
     console.log('post!');
-    if (request.url === "/setup.html") {
-      // Data submitted via POST from setup.html is to replace the init.json
-      // file used by the controller backend.
-      
-      var requestBody = '';
-      request.on('data', function(data) {
+    
+    var requestBody = '';
+    request.on('data', function(data) {
         requestBody += data;
         if(requestBody.length > 1e7) {
           response.writeHead(413, 'Request Entity Too Large', {'Content-Type': 'text/html'});
-          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+          response.end(html413);
         }
-      });
-      request.on('end', function() {
-        //console.log(requestBody);
-        var formData = JSON.parse(requestBody);
-        //console.log(formData);
-        // Write new data
-        fs.writeFileSync(base_dir+'init.json', requestBody, 'utf8');
-        // Update plotedit.json
-        updatePlotVars(formData.init.DataLog);
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.end('Done!');
-      });
-    } else if (request.url === "/statusedit.html") {
-      // Data submitted via POST from statusedit.html is to replace the status.json
-      // file used by status.html.
+    });
+    var pages = {
+      "/setup.html": "init.json",
+      "/statusedit.html": "status.json",
+      "/devices.html": "devices.json",
+      "/plotedit.html": "plotedit.json"
+    };
       
-      var requestBody = '';
-      request.on('data', function(data) {
-        requestBody += data;
-        if(requestBody.length > 1e7) {
-          response.writeHead(413, 'Request Entity Too Large', {'Content-Type': 'text/html'});
-          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
-        }
-      });
+    if (request.url in pages) {
       request.on('end', function() {
-        //console.log(requestBody);
-        var formData = JSON.parse(requestBody);
-        //console.log(formData);
-        fs.writeFile(base_dir+'status.json', requestBody, 'utf8');
+        var init = JSON.parse(requestBody).init;
+        //console.log(init);
+        fs.writeFile(base_dir + pages[request.url], requestBody, 'utf8');
         response.writeHead(200, {'Content-Type': 'text/html'});
         response.end('Done!');
+        if (request.url === "/setup.html") {
+          // in addition to init.json setup.html also updates plotVars
+          updatePlotVars(init.DataLog);
+        } 
       });
-    }
-    else if (request.url === "/plotedit.html") {
-      // Data submitted via POST from plotedit.html is to replace the plotedit.json
-      // file used by makeplot.js
-      
-      var requestBody = '';
-      request.on('data', function(data) {
-        requestBody += data;
-        if(requestBody.length > 1e7) {
-          response.writeHead(413, 'Request Entity Too Large', {'Content-Type': 'text/html'});
-          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
-        }
-      });
-      request.on('end', function() {
-        //console.log(requestBody);
-        var formData = JSON.parse(requestBody);
-        //console.log(formData);
-        fs.writeFile(base_dir+'plotedit.json', requestBody, 'utf8');
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.end('Done!');
-      });
-    }
-    else if (request.url === '/switches.html') {
-      // handle events to switch io pins
     }
     else {
       response.writeHead(404, 'Resource Not Found', {'Content-Type': 'text/html'});
-      response.end('<!doctype html><html><head><title>404</title></head><body>404: Resource Not Found</body></html>');
+      response.end(html404);
     }
   } else {
     response.writeHead(405, 'Method Not Supported', {'Content-Type': 'text/html'});
-    return response.end('<!doctype html><html><head><title>405</title></head><body>405: Method Not Supported</body></html>');
+    return response.end(html405);
   }
 }).listen(serverPort);
 
