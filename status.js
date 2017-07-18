@@ -5,6 +5,14 @@ httpRequest.open('GET', 'status.json', false);
 httpRequest.send();
 var stat = JSON.parse(httpRequest.responseText).stat;
 var titleText = JSON.parse(httpRequest.responseText).title;
+
+httpRequest.open('GET', 'recent.json', false);
+httpRequest.send();
+console.log(httpRequest.responseText);
+var recent = JSON.parse(httpRequest.responseText);//.slice(9, httpRequest.responseText.length);
+console.log(recent);
+
+
 document.title = titleText;
 
 var title_area = document.getElementById('title_text');
