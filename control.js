@@ -1,5 +1,16 @@
 const Agent = require('./agent');
+const Server = require('./server');
+const http = require('http');
+
+var serverPort = 8182;
+var server_dir = process.argv[2];
+//console.log(server_dir);
+
 var a = new Agent('./init.json');
+//var server = new Server(server_dir);
+//http.createServer(server.Server).listen(serverPort);
+Server.listen(serverPort);
+console.log('Server running at localhost:'+serverPort);
 
 var mainLoop = function() {
     a.setup();
@@ -44,14 +55,15 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
     }
 }
 
+
+console.log("Starting Agent...");
+mainLoop();
+
 // Define what to do if something goes wrong
 var doError = function() {
     console.warn('The drift exceeded the interval.');
 };
 
-console.log("Starting Agent...");
-mainLoop();
-// (The third argument is optional)
 var ticker = new AdjustingInterval(mainLoop, 60000, doError);
-ticker.start();
+//ticker.start();
 

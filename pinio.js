@@ -39,14 +39,15 @@ PinIO.prototype.getMinutesOff = function(){
 
 PinIO.prototype.setRelayOn = function(){
     var cmd = "gpioctl dirout-high " + this.pin;
-    ChildProcess.execSync(cmd);
+    //TODO: RPi pinio
+    //ChildProcess.execSync(cmd);
 
     this.status = 1;
     this.lastOn = + new Date();
 };
 
 PinIO.prototype.setRelayOff = function(){
-    var cmd = "gpioctl dirout-low " + this.pin;
+    //var cmd = "gpioctl dirout-low " + this.pin;
     ChildProcess.execSync(cmd);
 
     this.status = 0;

@@ -8,9 +8,15 @@ var titleText = JSON.parse(httpRequest.responseText).title;
 
 httpRequest.open('GET', 'recent.json', false);
 httpRequest.send();
-console.log(httpRequest.responseText);
-var recent = JSON.parse(httpRequest.responseText);//.slice(9, httpRequest.responseText.length);
-console.log(recent);
+//console.log(httpRequest.responseText);
+var recent = JSON.parse(httpRequest.responseText.slice(9, httpRequest.responseText.length));
+//console.log(recent);
+
+httpRequest.open('GET', 'loglist.json', false);
+httpRequest.send();
+//console.log(httpRequest.responseText);
+var loglist = JSON.parse(httpRequest.responseText).loglist;//.slice(9, httpRequest.responseText.length);
+//console.log(loglist);
 
 
 document.title = titleText;

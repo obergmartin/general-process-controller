@@ -1,3 +1,24 @@
+var deviceFunctionsOutput = {
+  "relayexp": [
+    "setRelayOn",
+    "setRelayOff"
+  ],
+  "gpio": [
+    "setRelayOn",
+    "setRelayOff",
+    "ignoreLastInput"
+  ],
+  "DS": [
+    " "
+  ],
+  "DHT": [
+    " "
+  ],
+  "Timer": [
+    " "
+  ]
+};
+
 function make_row(cellInfo) {
   // Returns a TR element with necessary TD children to be attached to a document.
   
@@ -11,6 +32,12 @@ function make_row(cellInfo) {
       content = document.createElement("input");
       content.type = "text";
       content.value = cur.val;
+      //content.style = "copyable_input";
+      content.setAttribute('onclick', 'this.select();')
+      //content.onClick = content.select();
+      if (cur.hasOwnProperty('size')) {
+        content.size = cur.size;
+      }
     } 
     else if (cur.type === "inputAddr") {
       // attach function for when text box is selected
@@ -36,6 +63,12 @@ function make_row(cellInfo) {
       content.type = "radio";
       content.setAttribute('name', cur.val[0]);
       content.checked = cur.val[1];
+    }
+    else if (cur.type === "button") {
+      content = document.createElement("input");
+      content.type = "button";
+      content.setAttribute('value', cur.val[0]);
+      //content.onclick = cur.val[1];
     }
     else if (cur.type == null) {
       content = document.createElement('p');

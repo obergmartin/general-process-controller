@@ -4,11 +4,12 @@ var ChildProcess = require('child_process');
 
 function DHT22(pin){
     this.pin = pin;
-    this.cmd = "./AdafruitDHT.py 22 " + this.pin;
+    this.cmd = "python /home/pi/sources/Adafruit_Python_DHT/examples/AdafruitDHT.py 22 " + this.pin;
 }
 
 DHT22.prototype.readSensor = function() {
     var result = ChildProcess.execSync(this.cmd).toString().trim();
+    console.log(result);
     // Temp=16.7*  Humidity=64.0%
     
     // 'Temp=' is 5 characters

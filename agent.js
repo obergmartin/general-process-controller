@@ -5,7 +5,7 @@ const fs = require('fs');
 const DS = require('./ds');
 const DHT = require('./dht22');
 const Gpio = require('./pinio');
-const MyClock = require('./myclock');
+const Timer = require('./myclock');
 
 if (os.arch() === 'mipsel') {
   // relay expansion board is only compatable with Omega boards
@@ -64,6 +64,27 @@ Agent.prototype.makeFn = function(){
     return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.csv';
 };
 
+Agent.prototype.evalFn = function (fn, astr, bstr) {
+    // lookup value for "a" or use constant
+    var a = (this.inputVals.hasOwnProperty(astr))
+      ? this.inputVals[astr]
+      : + astr;
+    // if constant, return it.
+    if (fn === 'const') { 
+      return(a);
+    }
+    // if function takes one value, compute and return
+    else if (fn === "not") {
+      return(funs[fn](a));
+    }
+    // lookup value for "b" or use constant
+    var b = (this.inputVals.hasOwnProperty(bstr))
+      ? this.inputVals[bstr]
+      : + bstr;
+    // compute and return
+    return(funs[fn](a, b));
+}
+  
 Agent.prototype.updateVals = function() {
   // InputValues can be: 
   //   Constants: "Name": n, "Const": c
@@ -76,7 +97,7 @@ Agent.prototype.updateVals = function() {
  
   for (var i=0; i<this.InputValFn.length; i++) {
   	var cur = this.InputValFn[i];
-  	//console.log(cur);
+  	console.log('updateVals', cur);
     
     if ('Device' in cur) {
       //console.log(cur);
@@ -86,32 +107,18 @@ Agent.prototype.updateVals = function() {
       } else {
         this.inputVals[cur.Name] = this.dev[cur.Device][cur.fn]();
       }
-    } 
-    else if ('Eval' in cur) {
-      if (typeof cur.Eval === 'string') {
-      	// "Eval": constant
-      	this.inputVals[cur.Name] = + cur.Eval;
-      }
-      else {
-        // "Eval": [fn, a, b]
-        //console.log(cur);
-        var fn = cur.Eval[0];
-        // a, b can be an already computed value or a set constant
-        // There should be some error checking here...
-        var a = (cur.Eval[1] in this.inputVals) 
-          ? this.inputVals[cur.Eval[1]]
-          : cur.Eval[1];
-        if (cur.Eval.length === 3) {
-          var b = (cur.Eval[2] in this.inputVals)
-            ? this.inputVals[cur.Eval[2]]
-            : cur.Eval[2];
-          this.inputVals[cur.Name] = funs[fn](a, b);
-        }
-        else {
-          this.inputVals[cur.Name] = funs[fn](a);
-        }
-      }
     }
+  }
+  
+  
+  for (var i = 0; i < this.Evals.length; i++) {
+    //if ('Eval' in cur) {
+      
+    // "Eval": [fn, a, b]
+    var cur = this.Evals[i];
+    console.log(cur);
+    this.inputVals[cur.Name] = this.evalFn(cur["Function"], cur["a"], cur["b"]);
+
     if (this.verbose) {
       console.log(cur, this.inputVals[cur.Name]);
     }
@@ -128,16 +135,18 @@ Agent.prototype.updateActs = function() {
     console.log('\nupdateActions:');
   }
 
-  for (var i=0; i<this.Actions.length; i++) {
+  for (var i = 0; i < this.Actions.length; i++) {
     var cur_act = this.Actions[i];
+    console.log('updateActs', cur_act);
+    
     // == allows for 1 to evaluate as true
     var isTrue = (this.inputVals[cur_act.Trigger] == true);
 
     if (isTrue === true) {
       if (this.verbose) {
-        console.log(cur_act.Trigger, isTrue, ':', cur_act.Object, cur_act.fn);
+        console.log(cur_act.Trigger, isTrue, ':', cur_act.Device, cur_act.fn);
       }
-      this.dev[cur_act.Object][cur_act.fn]();
+      this.dev[cur_act.Device][cur_act.fn]();
     } else {
       if (this.verbose) {
         console.log(cur_act.Trigger, isTrue);
@@ -149,7 +158,10 @@ Agent.prototype.updateActs = function() {
 
 Agent.prototype.setup = function() {
   var obj = fs.readFileSync(this.initFile, 'utf-8');
+  var devFile = fs.readFileSync('./devices.json', 'utf-8');
   this.ini = JSON.parse(obj).init;
+  this.ini.Devices = JSON.parse(devFile).Devices;
+  console.log(this.ini);
   
   if (this.verbose) {
     console.log('setup...');
@@ -178,10 +190,10 @@ Agent.prototype.setup = function() {
         this.dev[cur.Name] = new RelayExp(+parm[0], +parm[1]);
       }
     }
-    else if (cur.Type === 'MyClock'){ 
+    else if (cur.Type === 'Timer'){ 
       if (!(cur.Name in this.dev)) {
         //var obj = new MyClock();
-        this.dev[cur.Name] = new MyClock();
+        this.dev[cur.Name] = new Timer();
       }
       //console.log(obj);
     }
@@ -198,6 +210,7 @@ Agent.prototype.setup = function() {
 
   //this.dev[cur.Name] = obj;
   }
+  console.log('setup', this.dev);
   
   this.InputValFn = this.ini.InputVals;
   
@@ -208,11 +221,14 @@ Agent.prototype.setup = function() {
     console.log(this.InputValFn);
   }
   
-  for (var i=0; i<this.ini.Evals.length; i++) {
-      var cur = this.ini.Evals[i];
+  //for (var i=0; i<this.ini.Evals.length; i++) {
+  //    var cur = this.ini.Evals[i];
       //console.log(i, cur);
-      this.InputValFn.push({"Name":cur.Name, "Eval": cur.Eval});
-  }
+      //this.InputValFn.push({"Name":cur.Name, "Eval": cur.Eval});
+  //    this.InputValFn.push({"Name":cur.Name, "Eval": cur.Eval});
+  //}
+  this.Evals = this.ini.Evals;
+  
   if (this.verbose) {
     console.log('evals', this.InputValFn);
   }
@@ -255,13 +271,14 @@ Agent.prototype.setup = function() {
   }
   // otherwise filename has already been set and header written.
   this.inputVals.date = this.makeFn().substr(0,10);
+  
 };
 
 
 Agent.prototype.GetRecentLogFile = function() {
   // returns most recent iteration of log file.  Assumes the user isn't renaming
   // files.
-  var myclk = new MyClock();
+  var myclk = new Timer();
   var tdate = myclk.makeFn().split('.')[0];
   var rexp = new RegExp(tdate);
   var filt_fun = function(i) { return rexp.test(i); };
