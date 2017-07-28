@@ -1,0 +1,188 @@
+<HTML>
+<HEAD>
+    <TITLE>Plot Config</TITLE>
+    <script src="app.js"></script>
+    <LINK rel='stylesheet' type='text/css' href='style.css'>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<script src="./Sortable.min.js"></script>
+
+<h2>Status Config</h2>
+<div id='navigation'></div>
+<script type="text/javascript" src="links.js"></script>
+
+<script type="text/javascript" src="recent.json"></script>
+
+<div id='var_area' class='block_container'>
+<b>Variables</b>
+</div><br>
+
+<div id='tail_area' class='block_container'>
+<input type='submit' id='update_button' style="float: right;">
+</div>
+
+
+<script>
+//
+var sort_opts = {
+  filter: '.js-remove',
+  onFilter: function (evt) {
+    var el = editableList.closest(evt.item); 
+    el && el.parentNode.removeChild(el);
+  }
+};
+
+function makePlotVarRow(tn, rn, rc, t1, cb, t2) {
+  var new_row = document.createElement('tr');
+  
+  var content = document.createElement('p');
+  content.innerText = tn;
+  var new_cell = document.createElement('td');
+  new_cell.appendChild(content);
+  new_row.appendChild(new_cell);
+  
+  content = document.createElement('input');
+  content.type = 'radio';
+  content.setAttribute('name', rn);
+  content.checked = rc;
+  new_cell = document.createElement('td');
+  new_cell.appendChild(content);
+  new_row.appendChild(new_cell);
+  
+  content = document.createElement('input');
+  content.type = 'text';
+  content.value = t1;
+  new_cell = document.createElement('td');
+  new_cell.appendChild(content);
+  new_row.appendChild(new_cell);
+  
+  content = document.createElement('input');
+  content.type = 'checkbox';
+  content.checked = cb;
+  new_cell = document.createElement('td');
+  new_cell.appendChild(content);
+  new_row.appendChild(new_cell);
+  
+  content = document.createElement('input');
+  content.type = 'text';
+  content.value = t2;
+  content.size = 8;
+  new_cell = document.createElement('td');
+  new_cell.appendChild(content);
+  new_row.appendChild(new_cell);
+  
+  return new_row;
+}
+
+//var httpRequest = new XMLHttpRequest();
+//httpRequest.open('GET', 'init.json', false);
+//httpRequest.send();
+//var init = JSON.parse(httpRequest.responseText).init;
+
+//httpRequest.open('GET', 'plotedit.json', false);
+//httpRequest.send();
+//var plotVars = JSON.parse(httpRequest.responseText).plotVars;
+//console.log(plotVars);
+
+var plotVars;
+ws.onopen = function() {
+  ws.send(JSON.stringify({'getFile': 'plotedit.json'}));
+  //showPage();
+};
+
+ws.onmessage = function (event) {
+  var mess = JSON.parse(event.data);
+  console.log(mess);
+  if (mess.hasOwnProperty('plotVars')) {
+    var data = mess['plotVars'];
+    console.log(data);
+    plotVars = data;
+    showPage();
+  }
+};
+  
+
+function showPage() {
+  //make table
+  table = document.createElement('table');
+  var sortableInputVals = Sortable.create(table, sort_opts);
+  header = table.createTHead();
+  header.appendChild( makeTextRow(['Variable', 'Xaxis','Label', 'isBool', 'Options']) );
+
+  for (var v in plotVars) {
+    var curV = plotVars[v];
+    //var new_row = make_row( [
+    //  v,
+    //  {"type": "radio",     "val": ["isX", plotVars[v].Axis === "x"]},
+    //  {"type": "inputText", "val": plotVars[v].Label},
+    //  {"type": "checkBox",  "val": plotVars[v].isBool},
+    //  {"type": "inputText", "val": plotVars[v].Options}
+    //]);
+    var isChecked = plotVars[v].Axis === "x";
+    var new_row = makePlotVarRow(v, 'isX', isChecked, curV.Label, curV.isBool, curV.Options);
+    table.appendChild(new_row);
+  }
+
+  var_area.appendChild(table);
+
+
+  var button = document.getElementById('update_button');
+  update_button.value = 'Update!';
+  update_button.onclick = function(){ update_page(); };
+}
+
+
+function update_page() {
+  dat = {};
+  
+  for (var i = 1; i < table.rows.length; i++) {
+    var var_name = table.rows[i].cells[0].children[0].innerText;
+    var ax = (table.rows[i].cells[1].children[0].checked) ? "x" : "y";
+    dat[var_name] = {
+        "Axis":    ax, 
+        "Label":   table.rows[i].cells[2].children[0].value,
+        "isBool":  table.rows[i].cells[3].children[0].checked,
+        "Options": table.rows[i].cells[4].children[0].value
+    };
+  }
+  
+  //xhr = new XMLHttpRequest();
+  //var url = "/plotedit.html";
+  //xhr.open("POST", url);//, true);
+  //xhr.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+  //xhr.onreadystatechange = function () { 
+  //  if (xhr.readyState == 4 && xhr.status == 200) {
+  //    //var json = JSON.parse(xhr.responseText);
+  //    //console.log(xhr.responseText);
+  //    alert(xhr.responseText);
+  //  }
+  //};
+  
+  //var dataSend = JSON.stringify({"plotVars": dat}, null, ' ');
+  //console.log(dataSend);
+
+  //xhr.send(dataSend);
+  //window.location.href = "plotedit.html";
+  console.log(dat);
+  var toSend = {
+    saveData: {
+      File: 'plotedit.json', 
+      Data: dat
+    }
+  };
+  console.log(toSend);
+  //ws.send(toSend);
+  ws.send(JSON.stringify(toSend));
+}
+
+</script>
+
+<a href='status.html'>return to status</a>
+
+</BODY>
+</HTML>
+
+
+

@@ -6,7 +6,7 @@ function PinIO(pin){
     this.pin = pin;
     this.lastOn = + Date();
     this.lastOff = + Date();
-    //this.setRelayOff();
+    this.setRelayOff();
 }
     
 PinIO.prototype.getStatus = function(){
@@ -48,7 +48,7 @@ PinIO.prototype.setRelayOn = function(){
 
 PinIO.prototype.setRelayOff = function(){
     //var cmd = "gpioctl dirout-low " + this.pin;
-    ChildProcess.execSync(cmd);
+    //ChildProcess.execSync(cmd);
 
     this.status = 0;
     this.lastOff = + new Date();

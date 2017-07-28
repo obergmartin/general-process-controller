@@ -5,12 +5,15 @@ const fs = require('fs');
 const DS = require('./ds');
 const DHT = require('./dht22');
 const Gpio = require('./pinio');
-const Timer = require('./myclock');
+const Timer = require('./timer');
 
 if (os.arch() === 'mipsel') {
   // relay expansion board is only compatable with Omega boards
   const RelayExp = require('./relayexp');
 }
+
+var base_dir = './';
+var json_dir = './public/';
 
 var funs = {};
 funs.eq =  function(a,b){ return a == b; };
@@ -26,7 +29,7 @@ funs.diff= function(a,b){ return a - b < 0 ? b - a : a - b; };
 funs.not = function(a)  { return !a; };
 
 var ArraysAreEqual = function(a, b) {
-  if (a.length != b.length) {
+  if (a.length != b.length) { 
     return false;
   }
 
@@ -139,26 +142,28 @@ Agent.prototype.updateActs = function() {
     var cur_act = this.Actions[i];
     console.log('updateActs', cur_act);
     
-    // == allows for 1 to evaluate as true
-    var isTrue = (this.inputVals[cur_act.Trigger] == true);
+    if (!cur_act.Override){
+        // == allows for 1 to evaluate as true
+        var isTrue = (this.inputVals[cur_act.Trigger] == true);
 
-    if (isTrue === true) {
-      if (this.verbose) {
-        console.log(cur_act.Trigger, isTrue, ':', cur_act.Device, cur_act.fn);
+        if (isTrue === true) {
+          if (this.verbose) {
+            console.log(cur_act.Trigger, isTrue, ':', cur_act.Device, cur_act.fn);
+          }
+          this.dev[cur_act.Device][cur_act.fn]();
+        } else {
+          if (this.verbose) {
+            console.log(cur_act.Trigger, isTrue);
+          }
+        }
       }
-      this.dev[cur_act.Device][cur_act.fn]();
-    } else {
-      if (this.verbose) {
-        console.log(cur_act.Trigger, isTrue);
-      }
-    }
   }
 };
 
 
 Agent.prototype.setup = function() {
   var obj = fs.readFileSync(this.initFile, 'utf-8');
-  var devFile = fs.readFileSync('./devices.json', 'utf-8');
+  var devFile = fs.readFileSync(json_dir + 'devices.json', 'utf-8');
   this.ini = JSON.parse(obj).init;
   this.ini.Devices = JSON.parse(devFile).Devices;
   console.log(this.ini);
@@ -193,7 +198,10 @@ Agent.prototype.setup = function() {
     else if (cur.Type === 'Timer'){ 
       if (!(cur.Name in this.dev)) {
         //var obj = new MyClock();
-        this.dev[cur.Name] = new Timer();
+        var addr_ = cur.addr.split(',');
+        var lat = addr_[0];
+        var lon = addr_[1];
+        this.dev[cur.Name] = new Timer(lat, lon);
       }
       //console.log(obj);
     }
@@ -201,6 +209,7 @@ Agent.prototype.setup = function() {
       // if name not in list of this.dev, then add it
       if (!(cur.Name in this.dev)){
         this.dev[cur.Name] = new DHT(cur.addr);
+        this.dev[cur.Name].readSensor();
       }
       // else update values
       else {
@@ -242,13 +251,16 @@ Agent.prototype.setup = function() {
   this.logfn = this.GetRecentLogFile();
   //console.log(this.logfn);
 
-  if (this.logfn == -1) {
+
+  //if (this.logfn == -1) {
+  if (0){
     // no log file yet, make new one
     this.MakeFileName();
     this.logVars = this.ini.DataLog;
     this.WriteLogHeader();
   } 
-  else {
+  //else {
+  if (0) {
     // log file(s) already exist. 
     // Has program just started?
     if (this.logVars.length === 0) {
@@ -264,16 +276,21 @@ Agent.prototype.setup = function() {
     }
     // Already running, have there been changes to the log vars?
     else if (!ArraysAreEqual(this.logVars, this.ini.DataLog)) {
-      this.logVars = this.ini.DataLog;
-      this.IterFileName();
-      this.WriteLogHeader();
+      //this.logVars = this.ini.DataLog;
+      //this.IterFileName();
+      //this.WriteLogHeader();
+      UpdateLogFile();
     }
   }
+  
   // otherwise filename has already been set and header written.
   this.inputVals.date = this.makeFn().substr(0,10);
   
 };
 
+Agent.prototype.UpdateLogFile = function() {
+  // log file header and current
+}
 
 Agent.prototype.GetRecentLogFile = function() {
   // returns most recent iteration of log file.  Assumes the user isn't renaming
@@ -315,52 +332,108 @@ Agent.prototype.WriteLogHeader = function() {
 
 
 Agent.prototype.MakeFileName = function() {
-    var myclk = new MyClock();
+    var myclk = new Timer();
     this.logfn = myclk.makeFn();
 };
 
 
-Agent.prototype.IterFileName = function() {
-  // remove file extension
-  var basename = this.logfn.split('.csv')[0];
 
-  if (basename.indexOf('_') == -1) {
-    // first iteration
-    this.logfn = basename + '_1.csv';
-    if (this.verbose) {
-      console.log('iterfilename: ', this.logfn);
+
+Agent.prototype.logData = function() {
+    // IF needed, add columns to data file for extra variables
+    // find out if there are extra columns in the current data.
+    var datFile = fs.readFileSync('./data/' + this.logfn, 'utf-8').split('\n');
+    var fh = datFile[0];
+    var lastDatLine = datFile[datFile.length-1];
+    var prevVars = fh.split(',');
+    //console.log('total lines', datFile.length);
+    //console.log('prev vars', prevVars);
+    
+    var remain = []; //this.logVars;
+    // Go through this.logVars to see if new columns need to be added.
+    //for (var i = 0; i < prevVars.length; i++) {
+    for (var i = 0; i < this.logVars.length; i++) {
+      var curVar = this.logVars[i];
+      var ind = prevVars.indexOf(curVar);
+      //if (!this.inputVals.hasOwnProperty(prevVars[i])) {
+      if (ind === -1) {
+        // if not in header, mark as needed
+        remain.push(curVar);
+        // also update header cols
+        prevVars.push(curVar);
+      }
     }
-  } else {
-    // iterate '_1' part of basename
-    var parts = basename.split('_');
-    parts[1] = String(+parts[1] +1);
-    this.logfn = parts.join('_') + '.csv';
-    if (this.verbose) {
-      console.log('iterfilename: ', this.logfn);
+    console.log('remaining vars:', remain);
+    
+    var dat;
+    // Add columns to data file
+    var nRemain = remain.length;
+    if (nRemain > 0) {
+      for (var r = 0; r < datFile.length-1; r++) {
+        if (r === 0) {
+          // write new header
+          dat = datFile[r] + ',' + remain.join(',') + '\n';
+          //prevVars.push(
+          //console.log('making new log file:', dat);
+          fs.writeFileSync('./data/' + this.logfn, dat);
+        }
+        else if (r === 1) {
+          // append old data + NaNs for new cols
+          dat = datFile[r] + ',NaN'.repeat(nRemain) + '\n';
+          fs.appendFileSync('./data/' + this.logfn, dat);
+        }
+        else {
+          // append old data + '' for new cols
+          dat = datFile[r] + ','.repeat(nRemain) + '\n';
+          fs.appendFileSync('./data/' + this.logfn, dat);
+        }
+        //console.log('row', r);
+        //console.log('dat', dat);
+      }
     }
-  }
 
-  if (this.verbose) {
-    console.log('./data/' + this.logfn);
-  }
-};
-
-
-Agent.prototype.dataLog = function() {
-
-    var dat = '';
-
-    for (var i=0; i<this.logVars.length; i++) {
-    	var cur_val = (this.logVars[i] == 'Time' )
-            ? this.inputVals[this.logVars[i]]
-            : + this.inputVals[this.logVars[i]];
-            //console.log(this.logVars[i], cur_val);
-        dat += cur_val;
-        if (i < this.logVars.length-1) { 
+    // log file columns now match (or exceedes) new data to append    
+    dat = '';
+    for (var i = 0; i < prevVars.length; i++) {
+        var curCol = prevVars[i];
+        var ind = this.logVars.indexOf(curCol);
+        //console.log('header col:', curCol);
+        //console.log('cur val ind', ind);
+        if (ind > -1) {
+        //if (this.inputVals.hasOwnProperty(curCol)) {
+            // There is a logVar for this data column, use it
+            dat += this.inputVals[curCol];
+        }
+        else if (lastDatLine[i] === 'NaN') {
+            // No logVar for this data column and last was NaN,
+            // use empty column to save on file size.
+            dat += '';
+        }
+        else {
+            // No logVar for this data column, but there was previously
+            // Mark as NaN
+            dat += 'NaN';
+        }
+        if (i < prevVars.length-1) { 
             dat += ',';
         }
+        //console.log('dat:', dat);
     }
     dat += '\n';
+    
+    //for (var i=0; i<this.logVars.length; i++) {
+    //    // 'Time' is the only string variable
+    //	var cur_val = (this.logVars[i] == 'Time' )
+    //        ? this.inputVals[this.logVars[i]]
+    //        : + this.inputVals[this.logVars[i]];
+    //        //console.log(this.logVars[i], cur_val);
+    //    dat += cur_val;
+    //    if (i < this.logVars.length-1) { 
+    //        dat += ',';
+    //    }
+    //}
+    //dat += '\n';
+    
     if (this.verbose) {
       console.log('./data/' + this.logfn);
     }
@@ -368,12 +441,26 @@ Agent.prototype.dataLog = function() {
     
     // A file containing the most recent values is used for displaying.
     var dataWrite = 'recent = ' + JSON.stringify(this.inputVals, null, ' ');
-    fs.writeFileSync('recent.json', dataWrite);
+    fs.writeFileSync(json_dir + 'recent.json', dataWrite);
 };
 
 
 Agent.prototype.plotData = function() {
 
+};
+
+Agent.prototype.start = function() {
+  this.setup();
+  this.updateVals();
+  this.logData();
+};
+
+
+Agent.prototype.run = function() {
+    this.setup();
+    this.updateVals();
+    this.updateActs();
+    this.logData();
 };
 
 module.exports = Agent;

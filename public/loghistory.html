@@ -1,0 +1,95 @@
+<html>
+
+<head>
+<title>Data Logs</title>
+<meta name=viewport content='width=370'>
+<script src="Chart.min.js"></script>
+<script src="utils.js"></script>
+</head>
+
+<body bgcolor=#ffffff text=#000000 link=#ff0000 vlink=#880000 alink=#00ff00>
+
+<script type="text/javascript" src="makeplot.js"></script>
+
+<h2> Data Logs</h2>
+<script type="text/javascript" src="links.js"></script>
+
+<div style="width:450px;">
+<canvas id="canvas"></canvas>
+</div>
+
+
+<div id='navArea'>
+<p>Select data file</p>
+<input id='button' type='button' value='Submit'>
+</div>
+
+<script>
+var getfile;     
+
+var host = window.document.location.host.replace(/:.*/, '');
+var ws = new WebSocket('ws://' + host + ':8080');
+ws.onopen = function() {
+
+  ws.onmessage = function (event) {
+    var mess = JSON.parse(event.data);
+    //console.log(mess);
+    if (mess.hasOwnProperty('logList')) {
+      data = mess['logList'];
+      console.log(data);
+      update_select(data);
+      //plot_it();
+    }
+    else if (mess.hasOwnProperty('dataLog')) {
+      data = mess['dataLog'];
+      console.log(data);
+      plot_it();
+    }
+  };
+  var msg = "getLogList";
+  //console.log(msg);
+  ws.send(JSON.stringify(msg));
+
+};
+
+
+function update_select(loglist) {
+  var content = document.getElementById("selectLog");
+  for (var i = 0; i < loglist.length; i++) {
+    content.options.add( new Option(loglist[i], loglist[i]) );
+  }
+  content.value = loglist[0];
+};
+
+</script>
+
+
+
+<script>
+var navArea = document.getElementById('navArea');
+var theButton = document.getElementById('button');
+theButton.onclick = submit_log;
+
+function submit_log() {
+  var val = document.getElementById('selectLog').value;
+  getfile = val;
+  var toSend = {'getLog': val};
+  console.log(toSend);
+  ws.send(JSON.stringify(toSend)); 
+}
+
+var content = document.createElement("select");
+content.id = "selectLog";
+//content.name = 'val';
+//for (var j=0; j<loglist.length; j++) {
+//  content.options.add( new Option(loglist[j], loglist[j]) );
+//}
+//content.value = getfile;
+
+navArea.insertBefore(content, theButton);
+
+</script>
+
+</body>
+
+</html>

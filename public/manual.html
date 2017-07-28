@@ -1,0 +1,234 @@
+<HTML>
+<HEAD>
+  <TITLE>Manual Conrtol</TITLE>
+  
+  <script src='app.js'></script>
+  <LINK rel='stylesheet' type='text/css' href='style.css'>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<h2>Manual Control</h2>
+<div id='navigation'></div>
+<script type="text/javascript" src="links.js"></script>
+
+<div id='control_dev_area' class='block_container'><b>Manual Control</b></div><br>
+
+
+<script>
+
+function update_page() {
+  //dat = {};
+  //dat.DataLog = [];
+  //console.log(init);
+
+  // Save Devices
+  //dat.
+  
+  //console.log(dat.DataLog);
+  xhr = new XMLHttpRequest();
+  
+  var url = "/manual.html";
+  xhr.open("POST", url);//, true);
+  xhr.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+  //xhr.onreadystatechange = function () { 
+  //  if (xhr.readyState == 4 && xhr.status == 200) {
+  //    //var json = JSON.parse(xhr.responseText);
+  //    console.log(xhr.responseText);
+  //    alert(xhr.responseText);
+  //  }
+  //};
+  var dataSend = JSON.stringify({'Devices': Devices}, null, ' ');
+  console.log(dataSend);
+  xhr.send(dataSend);
+  window.location.href = "manual.html";
+}
+</script>
+
+<script>
+var tables = {}
+//var dslist = ["28-0000037a1687", "28-00000000"];
+var sort_opts = {
+  filter: '.js-remove',
+  onFilter: function (evt) {
+    var el = editableList.closest(evt.item); 
+    el && el.parentNode.removeChild(el);
+  }
+};
+
+
+
+//function update_ds() {
+//  var httpRequest = new XMLHttpRequest();
+//  httpRequest.open('GET', 'dslist.json', false);
+//  httpRequest.send();
+//  var dslist = JSON.parse(httpRequest.responseText).dslist;
+
+//  var content = document.getElementById('ds_text');
+//  content.innerHTML = dslist.join('<br>');
+
+  //var area = document.getElementById('area');
+  //area.appendChild(content);
+//}
+
+//
+  
+
+
+
+// start doing stuff
+
+
+
+var httpRequest = new XMLHttpRequest();
+httpRequest.open('GET', 'devices.json', false);
+httpRequest.send();
+var devices = JSON.parse(httpRequest.responseText).Devices;
+//console.log(httpRequest.responseText);
+
+//var host = window.document.location.host.replace(/:.*/, '');
+//var ws = new WebSocket('ws://' + host + ':8080');
+ws.onopen = function() {
+  show_page();
+};
+//ws.onmessage = function (event) {
+//  var mess = JSON.parse(event.data);
+//  console.log(mess);
+//};
+//ws.onmessage = function (event) {
+//  var stats = JSON.parse(event.data);
+//  //console.log('onmessage', stats);
+//  updateStats(stats);
+//};
+
+//TODO:
+function updateStats(stats) {
+  //console.log(devices);
+  //console.log('update', stats);
+  for (var i = 0; i < devices.length; i++ ) {
+    var cur_dev = devices[i].Name;
+    if (stats.hasOwnProperty(cur_dev)) {
+      document.getElementById(cur_dev+'_status').innerHTML = stats[cur_dev];
+    }
+  }
+}
+
+
+
+
+
+var deviceTypes = [];
+for (var i in deviceFunctionsInput) {
+  deviceTypes.push(i);
+}
+
+var but_fn = function() {
+  // row is: 'Override', 'Device', 'Status', 'Function', 'Button'
+  var cur_row = this.parentElement.parentElement;
+  var selDev = cur_row.children[1].firstElementChild.innerText;
+  var selFn = cur_row.children[3].firstElementChild.value;
+  var msg = {'doAction': [selDev, selFn]};
+  ws.send(JSON.stringify(msg));
+};
+
+var activateButton = function() {
+  // row is: 'Override', 'Device', 'Status', 'Function', 'Button'
+  var cur_row = this.parentElement.parentElement; 
+  var selBox = cur_row.children[0].firstElementChild.checked;
+  var curBut = cur_row.children[4].firstElementChild;
+  curBut.disabled = !selBox;
+  //console.log(selBox);
+};
+
+
+
+function show_page() {
+  //
+  // Manual Control
+  //var avail_devs = [];
+  var control_area = document.getElementById("control_dev_area");
+  control_area.align = 'left';
+
+  //make table
+  tables.Control = document.createElement('table');
+  //var sortableDevices = Sortable.create(tables.Devices, sort_opts);
+  header = tables.Control.createTHead();
+  var new_row = document.createElement('tr');
+  new_row.appendChild(tdWithP('Override'));
+  new_row.appendChild(tdWithP('Device'));
+  new_row.appendChild(tdWithP('Status'));
+  new_row.appendChild(tdWithP('Function'));
+  new_row.appendChild(tdWithP(' '));
+
+  
+  //header.appendChild( make_row(['Override', 'Device', 'Status', 'Function', ' ']) );
+  header.appendChild(new_row);
+
+  // Add rows from DEVICES section
+  var new_cell;
+  var content;
+  for (var i = 0; i < devices.length; i++) {
+    new_row = document.createElement('tr');
+    var isChecked = 0;
+    
+    content = document.createElement("input");
+    content.type = "checkbox";
+    content.checked = isChecked;
+    content.onchange = activateButton;
+    new_cell = document.createElement('td');
+    new_cell.appendChild(content);
+    new_row.appendChild(new_cell);
+    
+    content = document.createElement("p");
+    content.innerHTML = devices[i].Name;
+    new_cell = document.createElement('td');
+    new_cell.appendChild(content);
+    new_row.appendChild(new_cell);
+    
+    content = document.createElement("div");
+    content.id = devices[i].Name+'_status';
+    content.innerHTML = devices[i].Name+'_status';
+    new_cell = document.createElement('td');
+    new_cell.appendChild(content);
+    new_row.appendChild(new_cell);
+    
+    content = document.createElement("select");
+    var cur_options = deviceFunctionsOutput[devices[i].Type];
+    for (var j = 0; j < cur_options.length; j++) {
+      content.options.add( new Option(cur_options[j], cur_options[j]) );
+    }
+    content.value = '';
+    new_cell = document.createElement('td');
+    new_cell.appendChild(content);
+    new_row.appendChild(new_cell);
+
+    content = document.createElement("input");
+    content.type = "button";
+    content.value = 'Set';
+    content.onclick = but_fn;
+    content.disabled = !isChecked;
+    new_cell = document.createElement('td');
+    new_cell.appendChild(content);
+    new_row.appendChild(new_cell);
+    
+
+    //TODO:
+    var msg = {'getDevStatus': devices[i].Name};
+    //console.log(msg);
+    ws.send(JSON.stringify(msg));
+    tables.Control.appendChild(new_row);
+    //avail_devs.push(devices[i].Name);
+  }
+  control_area.appendChild(tables.Control);
+  
+
+  
+}
+
+//show_page();
+</script>
+
+
+</BODY>
+</HTML>

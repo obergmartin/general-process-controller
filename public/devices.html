@@ -1,0 +1,180 @@
+<HTML>
+<HEAD>
+    <TITLE>Device Setup</TITLE>
+    <script src='app.js'></script>
+    <LINK rel='stylesheet' type='text/css' href='style.css'>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<h2>Device Setup</h2>
+<div id='navigation'></div>
+<script type="text/javascript" src="links.js"></script>
+
+<script src="./Sortable.min.js"></script>
+<script type="text/javascript" src="./makerow.js"></script>
+
+<div id='ds_area' class='block_container'>
+<h4>DS sensors:</h4>
+<p id="ds_text"></p>
+</div>
+<br>
+
+
+
+<div id='input_dev_area' class='block_container'><b>Devices</b></div><br>
+
+<div id='tail_area' class='block_container'>
+<input type='submit' id='update_button' style="float: right;">
+</div>
+
+<script>
+//var host = window.document.location.host.replace(/:.*/, '');
+//var ws = new WebSocket('ws://' + host + ':8080');
+ws.onopen = function() {
+};
+
+
+
+function update_page() {
+  //dat = {};
+  //dat.DataLog = [];
+  //console.log(init);
+
+  // Save Devices
+  //dat.
+  var Devices = [];
+  for (var i = 1; i < tables.Devices.rows.length; i++) {
+    var r = {};
+    r.Name = tables.Devices.rows[i].cells[0].children[0].value;
+    r.Type = tables.Devices.rows[i].cells[1].children[0].value;
+    r.addr = tables.Devices.rows[i].cells[2].children[0].value;
+    
+    if (r.Name !== "") {
+      Devices.push(r);
+    }
+  }
+  
+  //console.log(dat.DataLog);
+  xhr = new XMLHttpRequest();
+  
+  //var url = "./devices.html";
+  //xhr.open("POST", url);//, true);
+  //xhr.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+  //xhr.onreadystatechange = function () { 
+  //  if (xhr.readyState == 4 && xhr.status == 200) {
+  //    //var json = JSON.parse(xhr.responseText);
+  //    console.log(xhr.responseText);
+  //    alert(xhr.responseText);
+  //  }
+  //};
+  var dataSend = JSON.stringify({'Devices': Devices}, null, ' ');
+  ws.send(JSON.stringify({"saveData": {"File": "devices.json", "Data": {"Devices": Devices}}}));
+  //console.log(dataSend);
+  //xhr.send(dataSend);
+  //window.location.href = "./devices.html";
+}
+</script>
+
+<script>
+var tables = {}
+//var dslist = ["28-0000037a1687", "28-00000000"];
+var sort_opts = {
+  filter: '.js-remove',
+  onFilter: function (evt) {
+    var el = editableList.closest(evt.item); 
+    el && el.parentNode.removeChild(el);
+  }
+};
+
+
+
+function update_ds(dslist) {
+  //console.log(dslist);
+  var content = document.getElementById('ds_text');
+  content.innerHTML = dslist.join('<br>');
+}
+
+//
+var action_button = document.createElement('input');
+action_button.type = 'button';
+action_button.value = 'Update';
+var msg = 'getDSlist';
+action_button.onclick = function() { ws.send(msg) };//update_ds;
+document.getElementById('ds_area').appendChild(action_button);
+
+  
+
+
+
+// start doing stuff
+
+
+
+var httpRequest = new XMLHttpRequest();
+httpRequest.open('GET', 'devices.json', false);
+httpRequest.send();
+var devices = JSON.parse(httpRequest.responseText).Devices;
+//console.log(httpRequest.responseText);
+
+
+
+var deviceTypes = [];
+for (var i in deviceFunctionsInput) {
+  deviceTypes.push(i);
+}
+
+function show_page() {
+
+  // Device Setup
+  var avail_devs = [];
+  var dev_area = document.getElementById("input_dev_area");
+  dev_area.align = 'left';
+
+  //make table
+  tables.Devices = document.createElement('table');
+  var sortableDevices = Sortable.create(tables.Devices, sort_opts);
+  var header = tables.Devices.createTHead();
+  header.appendChild( make_row(['Name', 'Device', 'Address/Pin']) );
+
+  // Add rows from DEVICES section  
+  for (var i = 0; i < devices.length; i++) {
+    var new_row = make_row( [
+      {'type': 'inputText', 'val': devices[i].Name},
+      {'type': 'selectMenu', 'val': [deviceTypes, devices[i].Type]},
+      {'type': 'inputText', 'val': devices[i].addr} ]);
+    tables.Devices.appendChild(new_row);
+    avail_devs.push(devices[i].Name);
+  }
+  dev_area.appendChild(tables.Devices);
+
+  // Button to add new rows
+  var dev_button = document.createElement("input");
+  dev_button.type = 'button';
+  dev_button.value = 'Add Row';
+  dev_button.onclick = function(){ 
+    var new_row = make_row( [
+    {'type': 'inputText', 'val': ''},
+    {'type': 'selectMenu', 'val': [deviceTypes, ""]},
+    {'type': 'inputText', 'val': ''} ]);
+    tables.Devices.appendChild(new_row);
+  };
+
+  dev_area.appendChild(dev_button);
+
+
+  // final button
+  var update_button = document.getElementById('update_button');
+  update_button.value = 'Update!';
+  update_button.onclick = function(){ update_page(); };
+  
+  tail_area.appendChild(update_button);
+}
+
+show_page();
+</script>
+
+
+</BODY>
+</HTML>

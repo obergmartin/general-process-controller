@@ -1,10 +1,10 @@
-'use strict';
 //http://stackoverflow.com/questions/24468459/sending-a-json-to-server-and-retrieving-a-json-in-return-without-jquery
 //http://stackoverflow.com/questions/15427220/how-to-handle-post-request-in-node-js
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
 var ChildProcess = require('child_process');
+
 
 var re_date = /^\/\d{4}-\d{2}-\d{2}/;
 
@@ -131,7 +131,16 @@ var ServerFn = function (request, response) {
   }
 
 //).listen(serverPort);
+//var s = new Server();
+var Server = http.createServer(ServerFn);//.listen(serverPort);
 
+
+Server.getDeviceStatus = function(d, fn) {
+  if (d === 'io1') {
+    return(this.agent.dev[d]['getStatus']());
+  }
+  return(-1);
+};
 
 var updatePlotVars = function(LogData) {
   //console.log("updating plotedit.json");
@@ -226,7 +235,5 @@ var GenDSSensorList = function() {
   //return "";
 };
 
-//var s = new Server();
-var Server = http.createServer(ServerFn);//.listen(serverPort);
 
 module.exports = Server;

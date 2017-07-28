@@ -1,0 +1,35 @@
+{
+ "stat": {
+  "Time": {
+   "Label": "Last reading at: ",
+   "Value": ""
+  },
+  "temp1": {
+   "Label": "Sensor Temp: ",
+   "Value": ""
+  },
+  "temp2": {
+   "Label": "Tap temp: ",
+   "Value": ""
+  },
+  "isOn": {
+   "Label": "Freezer is: ",
+   "Value": {
+    "0": "Off",
+    "1": "On"
+   }
+  },
+  "fanIsOn": {
+   "Label": "The fan is: ",
+   "Value": {
+    "0": "Off",
+    "1": "On"
+   }
+  },
+  "warmPt": {
+   "Label": "Setpoint: ",
+   "Value": ""
+  }
+ },
+ "title": "Keezer Status"
+}

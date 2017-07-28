@@ -1,0 +1,36 @@
+{
+  "Devices":
+  [
+    {
+      "Type": "DS",
+      "Functions": [
+        "getTempC",
+        "getTempF"
+      ]
+    },
+    {
+      "Type": "RelayExp",
+      "Functions": [
+        "isOn",
+        "isOff",
+        "getMinutesOn",
+        "getMinutesOff"
+      ]
+    },
+    {
+      "Type": "Gpio",
+      "Functions": [
+        "isOn",
+        "isOff",
+        "getMinutesOn",
+        "getMinutesOff"
+      ]
+    },
+    {
+      "Type": "MyClock",
+      "Functions": [
+        "getTimeStamp"
+      ]
+    }
+  ]
+}

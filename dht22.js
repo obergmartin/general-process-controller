@@ -23,19 +23,23 @@ DHT22.prototype.readSensor = function() {
     this.humid = parseFloat(h);
 }
 
-DHT22.prototype.getHumid = function(){
+DHT22.prototype.getHumid = function() {
     return this.humid;
 };
 
-DHT22.prototype.getTempC = function(){
+DHT22.prototype.getTempC = function() {
     return this.tempC;
 };
 
-DHT22.prototype.getTempF = function(){
+DHT22.prototype.getTempF = function() {
 	var t = this.getTempC();
     t = (t * 1.8) + 32;
     t = parseFloat(t.toFixed(1));
     return t;
+};
+
+DHT22.prototype.getStatus = function() {
+    return this.getTempC();
 };
 
 module.exports = DHT22;

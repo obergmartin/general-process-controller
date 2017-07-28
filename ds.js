@@ -15,6 +15,7 @@ DS.prototype.getTempC = function(){
     var i = result.search('t=');
     var t = result.substring(i+2) / 1000;
     t = parseFloat(t.toFixed(1));
+    this.tempC = t;
 
     return t;
 };
@@ -24,6 +25,10 @@ DS.prototype.getTempF = function(){
     t = (t * 1.8) + 32;
     t = parseFloat(t.toFixed(1));
     return t;
+};
+
+DS.prototype.getStatus = function() {
+    return this.getTempC();
 };
 
 module.exports = DS;

@@ -1,0 +1,40 @@
+{
+ "plotVars": {
+  "Time": {
+   "Axis": "x",
+   "Label": "Time",
+   "isBool": false,
+   "Options": "x"
+  },
+  "temp1": {
+   "Axis": "y",
+   "Label": "Sensor Temp",
+   "isBool": false,
+   "Options": "L1"
+  },
+  "temp2": {
+   "Axis": "y",
+   "Label": "Tap temp",
+   "isBool": false,
+   "Options": "L1"
+  },
+  "isOn": {
+   "Axis": "y",
+   "Label": "Freezer",
+   "isBool": true,
+   "Options": "R1"
+  },
+  "warmPt": {
+   "Axis": "y",
+   "Label": "Setpoint",
+   "isBool": false,
+   "Options": "L1"
+  },
+  "fanIsOn": {
+   "Axis": "y",
+   "Label": "Fan",
+   "isBool": true,
+   "Options": "R2"
+  }
+ }
+}

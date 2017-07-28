@@ -1,0 +1,121 @@
+<html>
+
+<head>
+    <title>Status</title>
+    <meta name="viewport" content='width=370'>
+    <script src="app.js"></script>
+    <script src="Chart.min.js"></script>
+    <script src="utils.js"></script>
+</head>
+
+<body bgcolor=#ffffff text=#000000 link=#ff0000 vlink=#880000 alink=#00ff00>
+
+<h1 id='title_text'> Hello, this is Title!</h1>
+<div id='navigation'></div>
+<script type="text/javascript" src="links.js"></script>
+
+<script type="text/javascript" src="makeplot.js"></script>
+
+<div id='main' class='block_container'></div>
+
+<div style="width:450px;">
+<canvas id="canvas"></canvas>
+</div>
+
+<script>
+
+var httpRequest = new XMLHttpRequest();
+//httpRequest.open('GET', 'status.json', false);
+//httpRequest.send();
+
+//var stat = JSON.parse(httpRequest.responseText).stat;
+//var titleText = JSON.parse(httpRequest.responseText).title;
+//document.title = titleText;
+
+
+httpRequest.open('GET', 'recent.json', false);
+httpRequest.send();
+console.log(httpRequest.responseText);
+var recent = JSON.parse(httpRequest.responseText.slice(9, httpRequest.responseText.length));
+console.log(recent);
+
+var data = {};
+var stat;
+var init;
+var plotVars;
+var getfile = recent.date+'.csv';
+
+ws.onopen = function() {
+  ws.send(JSON.stringify({'getFile': 'status.json'}));
+  ws.send(JSON.stringify({'getFile': 'plotedit.json'}));
+  ws.send(JSON.stringify({'getFile': 'init.json'}));
+  
+
+};
+ws.onmessage = function (event) {
+    var mess = JSON.parse(event.data);
+    console.log(mess);
+    if (mess.hasOwnProperty('init')) {
+      init = mess['init'];
+      console.log(init);
+      //makePage();
+    }
+    else if (mess.hasOwnProperty('stat')) {
+      stat = mess['stat'];
+      console.log(stat);
+      makePage();
+    }
+    else if (mess.hasOwnProperty('plotVars')) {
+      plotVars = mess['plotVars'];
+      console.log(plotVars);
+      //plot_it();
+      ws.send(JSON.stringify({"getLog": getfile}));
+    }
+    else if (mess.hasOwnProperty('dataLog')) {
+      data = mess['dataLog'];
+      console.log(data);
+      plot_it();
+    }
+
+};
+
+function fillValues() {
+  for (var v in stat) {
+    //console.log(v);
+    
+  }
+}
+
+function makePage() {
+  var title_area = document.getElementById('title_text');
+  //title_area.innerText = titleText;
+
+  var area = document.getElementById('main');
+
+  for (var v in stat){
+    var cur = document.createElement("p");
+    //console.log(v);
+    cur.id = v;
+    //var cur = document.getElementById(v);
+    cur.innerText = stat[v].Label;
+    if (stat[v].Value === '') {
+      cur.innerText += recent[v];
+    }
+    else {
+      cur.innerText += stat[v].Value[+recent[v]];
+    }
+    area.appendChild(cur);
+  }
+}
+
+//plot_it();
+</script>
+
+<p>
+<a href='statusedit.html'>edit this page</a> | 
+<a href='plotedit.html'>edit plot params</a>
+</p>
+
+</body>
+
+</html>
