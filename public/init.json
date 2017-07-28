@@ -1,0 +1,237 @@
+{
+ "init": {
+  "DataLog": [
+   "Time",
+   "temp1",
+   "temp2",
+   "isOn",
+   "fanIsOn",
+   "warmPt"
+  ],
+  "Devices": [
+   {
+    "Name": "ds1",
+    "Type": "DS",
+    "addr": "28-0000045d835b"
+   },
+   {
+    "Name": "ds2",
+    "Type": "DS",
+    "addr": "28-0000045c9ecc"
+   },
+   {
+    "Name": "io1",
+    "Type": "relayexp",
+    "addr": "7,0"
+   },
+   {
+    "Name": "fan",
+    "Type": "relayexp",
+    "addr": "7,1"
+   },
+   {
+    "Name": "time",
+    "Type": "MyClock",
+    "addr": "undefined"
+   }
+  ],
+  "InputVals": [
+   {
+    "Name": "Time",
+    "Device": "time",
+    "fn": "getTimeStamp"
+   },
+   {
+    "Name": "temp1",
+    "Device": "ds1",
+    "fn": "getTempC"
+   },
+   {
+    "Name": "temp2",
+    "Device": "ds2",
+    "fn": "getTempC"
+   },
+   {
+    "Name": "isOn",
+    "Device": "io1",
+    "fn": "isOn"
+   },
+   {
+    "Name": "isOff",
+    "Device": "io1",
+    "fn": "isOff"
+   },
+   {
+    "Name": "offTime1",
+    "Device": "io1",
+    "fn": "getMinutesOff"
+   },
+   {
+    "Name": "fanIsOn",
+    "Device": "fan",
+    "fn": "isOn"
+   },
+   {
+    "Name": "fanIsOff",
+    "Device": "fan",
+    "fn": "isOff"
+   },
+   {
+    "Name": "hr",
+    "Device": "time",
+    "fn": "getTime24"
+   }
+  ],
+  "Evals": [
+   {
+    "Name": "warmPt",
+    "Eval": "5.5"
+   },
+   {
+    "Name": "tempDiff",
+    "Eval": "1"
+   },
+   {
+    "Name": "coolPt",
+    "Eval": [
+     "sub",
+     "warmPt",
+     "tempDiff"
+    ]
+   },
+   {
+    "Name": "offCheck",
+    "Eval": [
+     "gt",
+     "offTime1",
+     "20"
+    ]
+   },
+   {
+    "Name": "beenOff",
+    "Eval": [
+     "and",
+     "isOff",
+     "offCheck"
+    ]
+   },
+   {
+    "Name": "isWarm",
+    "Eval": [
+     "gt",
+     "temp1",
+     "warmPt"
+    ]
+   },
+   {
+    "Name": "isCool",
+    "Eval": [
+     "lt",
+     "temp1",
+     "coolPt"
+    ]
+   },
+   {
+    "Name": "off_and_warm",
+    "Eval": [
+     "and",
+     "beenOff",
+     "isWarm"
+    ]
+   },
+   {
+    "Name": "isCool_and_on",
+    "Eval": [
+     "and",
+     "isCool",
+     "isOn"
+    ]
+   },
+   {
+    "Name": "fanStatus",
+    "Eval": "1"
+   },
+   {
+    "Name": "fanOn",
+    "Eval": [
+     "eq",
+     "fanStatus",
+     "1"
+    ]
+   },
+   {
+    "Name": "fanOff",
+    "Eval": [
+     "eq",
+     "fanStatus",
+     "0"
+    ]
+   },
+   {
+    "Name": "day1",
+    "Eval": [
+     "gt",
+     "hr",
+     "6"
+    ]
+   },
+   {
+    "Name": "day2",
+    "Eval": [
+     "lt",
+     "hr",
+     "18"
+    ]
+   },
+   {
+    "Name": "isDay",
+    "Eval": [
+     "and",
+     "day1",
+     "day2"
+    ]
+   },
+   {
+    "Name": "isNight",
+    "Eval": [
+     "not",
+     "isDay"
+    ]
+   },
+   {
+    "Name": "turnFanOn",
+    "Eval": [
+     "and",
+     "fanIsOff",
+     "fanOn"
+    ]
+   },
+   {
+    "Name": "turnFanOff",
+    "Eval": "false"
+   }
+  ],
+  "Actions": [
+   {
+    "Trigger": "off_and_warm",
+    "Object": "io1",
+    "fn": "setRelayOn"
+   },
+   {
+    "Trigger": "isCool_and_on",
+    "Object": "io1",
+    "fn": "setRelayOff"
+   },
+   {
+    "Trigger": "turnFanOn",
+    "Object": "fan",
+    "fn": "setRelayOn"
+   },
+   {
+    "Trigger": "turnFanOff",
+    "Object": "fan",
+    "fn": "setRelayOff"
+   }
+  ]
+ }
+}
